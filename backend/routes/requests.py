@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from database import get_db
 from models import CustomerRequest as CustomerRequestModel
-from schemas import CustomerRequest, CustomerRequestCreate
-from services.zalo_service import ZaloService
+from schemas import CustomerRequestCreate
+from services.telegramservice import TelegramService
 from datetime import datetime
 from typing import List
 import logging
@@ -53,7 +53,11 @@ async def create_request(
         return {
             "success": True,
             "message": "Yêu cầu của bạn đã được gửi thành công",
-            "data": db_request
+            "data": {
+                "id": db_request.id,
+                "name": db_request.name,
+                "phone": db_request.phone
+            }
         }
     except Exception as e:
         db.rollback()
@@ -64,10 +68,10 @@ async def send_zalo_messages(request_id: int, request_data: dict, customer_phone
     """Gửi tin nhắn Zalo cho admin và khách hàng"""
     try:
         # Gửi cho admin
-        admin_result = await ZaloService.send_message_to_admin(request_data)
+        admin_result = await TelegramService.send_message_to_admin(request_data)
         
         # Gửi xác nhận cho khách hàng
-        customer_result = await ZaloService.send_confirmation_to_customer(customer_phone, customer_name)
+        customer_result = await TelegramService.send_confirmation_to_customer(customer_name)
         
         # Cập nhật trạng thái
         db_request = db.query(CustomerRequestModel).filter(CustomerRequestModel.id == request_id).first()

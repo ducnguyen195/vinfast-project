@@ -35,7 +35,7 @@ def seed_products():
             "image_url": "🚗"
         },
         {
-            "name": "VinFast LUDO",
+            "name": "VinFast 3",
             "description": "MPV 7 chỗ lý tưởng cho gia đình, không gian rộng rãi, tiện nghi đầy đủ",
             "price": 680.0,
             "image_url": "🚐"
