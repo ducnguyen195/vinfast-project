@@ -7,8 +7,6 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://ducnguyen:ducnguyen@local
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-# Zalo Configuration
-ZALO_ACCESS_TOKEN = os.getenv("ZALO_ACCESS_TOKEN", "")
-ZALO_OFFICIAL_ACCOUNT_ID = os.getenv("ZALO_OFFICIAL_ACCOUNT_ID", "")
-ZALO_ADMIN_PHONE = os.getenv("ZALO_ADMIN_PHONE", "")
-ZALO_API_URL = "https://openapi.zalo.me/v2.0/oa"
+# Telegram Configuration
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8497586776:AAHpX32QqsOsNJbw0h3BGzwPCX5W9tylB0M")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "6002201117")
