@@ -30,6 +30,8 @@ async def create_request(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
+    if admin_token != "secret123":
+        raise HTTPException(status_code=403, detail="Không có quyền")
     """Tạo yêu cầu mới từ khách hàng"""
     try:
         # Tạo record trong database
@@ -80,7 +82,7 @@ async def send_telegram_messages(request_id: int, request_data: dict, customer_p
             db.commit()
             
     except Exception as e:
-        logger.error(f"Lỗi gửi Zalo: {str(e)}")
+        logger.error(f"Lỗi gửi Telegram: {str(e)}")
 
 @router.get("/{request_id}", response_model=dict)
 async def get_request(request_id: int, db: Session = Depends(get_db)):
