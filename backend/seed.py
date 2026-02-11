@@ -13,32 +13,32 @@ def seed_products():
         {
             "name": "VinFast VF 8",
             "description": "SUV thông minh với công nghệ tiên tiến, thời lượng pin lên đến 500km, trang bị hệ thống an toàn 5 sao, ghế da cao cấp",
-            "price": 800.0,
-            "image_url": "🚗"
+            "price": 800000000,
+            "image_url": "vinfast-vf8.png"
         },
         {
             "name": "VinFast VF 9",
             "description": "SUV hạng sang cao cấp với công nghệ tự lái cấp cao, nội thất sang trọng, hệ thống giải trí đỉnh cao",
-            "price": 1200.0,
-            "image_url": "🚙"
+            "price": 1499000000,
+            "image_url": "vinfast-vf9.png"
         },
         {
-            "name": "VinFast VF e34",
+            "name": "VinFast VF 7",
             "description": "Sedan compact giá rẻ, hiệu suất cao, tiết kiệm năng lượng, phù hợp với gia đình trẻ",
-            "price": 400.0,
-            "image_url": "🚕"
+            "price": 799000000,
+            "image_url": "vinfast-vf7.png"
         },
         {
-            "name": "VinFast LUX A2.0",
+            "name": "VinFast VF 6",
             "description": "Sedan thể thao với động cơ mạnh mẽ, phanh khí nén, thiết kế thể thao",
-            "price": 920.0,
-            "image_url": "🚗"
+            "price": 694000000,
+            "image_url": "vinfast-vf6.png"
         },
         {
-            "name": "VinFast 3",
+            "name": "VinFast VF 3",
             "description": "MPV 7 chỗ lý tưởng cho gia đình, không gian rộng rãi, tiện nghi đầy đủ",
-            "price": 680.0,
-            "image_url": "🚐"
+            "price": 299000000,
+            "image_url": "vinfast-vf3.png"
         },
     ]
     
