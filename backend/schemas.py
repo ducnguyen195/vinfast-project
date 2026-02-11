@@ -7,6 +7,8 @@ class ProductBase(BaseModel):
     description: str
     price: float
     image_url: Optional[str] = None
+    content: Optional[str] = None 
+
 
 class ProductCreate(ProductBase):
     pass
@@ -31,7 +33,7 @@ class CustomerRequestCreate(CustomerRequestBase):
 class CustomerRequest(CustomerRequestBase):
     id: int
     status: str
-    zalo_sent: str
+    telegram_sent: str
     created_at: datetime
     updated_at: datetime
 

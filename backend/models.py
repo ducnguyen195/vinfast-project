@@ -10,7 +10,9 @@ class Product(Base):
     description = Column(Text)
     price = Column(Float)
     image_url = Column(String(500))
+    content = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
+
 
 class CustomerRequest(Base):
     __tablename__ = "customer_requests"
@@ -22,6 +24,6 @@ class CustomerRequest(Base):
     product = Column(String(255))
     message = Column(Text, nullable=True)
     status = Column(String(50), default="pending")  # pending, contacted, completed
-    zalo_sent = Column(String(50), default="pending")  # pending, sent, failed
+    telegram_sent = Column(String(50), default="pending")  # pending, sent, failed
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
