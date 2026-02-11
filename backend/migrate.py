@@ -7,6 +7,7 @@ from models import Product, CustomerRequest
 def migrate():
     """Run migrations to create all tables"""
     print("📊 Running database migrations...")
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     print("✅ Database migration completed!")
 

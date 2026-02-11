@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from database import Base, engine
 from routes import products, requests as request_routes
+from routes import admin
 from config import DEBUG
 import logging
 
@@ -30,6 +31,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(admin.router)
 app.include_router(products.router)
 app.include_router(request_routes.router)
 

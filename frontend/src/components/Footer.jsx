@@ -7,8 +7,8 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <h3 className="text-xl font-bold mb-4">VinFast</h3>
-            <p className="text-gray-300">Công ty sản xuất xe điện thông minh hàng đầu Việt Nam</p>
+            <h3 className="text-xl font-bold mb-4">VinFast Nguyễn Văn Linh</h3>
+            <p className="text-gray-300">Đại lý chính hãng xe điện VinFast tại Hà Nội</p>
           </div>
 
           {/* Products */}
@@ -33,9 +33,11 @@ function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-lg font-bold mb-4">Liên Hệ</h4>
-            <p className="text-gray-300 mb-2">📞 1900 VINFAST</p>
-            <p className="text-gray-300">📧 support@vinfast.com</p>
+            <h4 className="text-xl font-bold mb-4">Liên Hệ</h4>
+            <p className="text-gray-100 text-lg mb-2">☎️ Hotline:  0986.585.054</p>
+            <p className="text-gray-100 mb-2 text-lg">📧 Email: quynhhoa@gmail.com</p>
+            <p className="text-gray-100 mb-2 text-lg">🏠 Địa chỉ: 985 Giải Phóng, Hà Nội</p>
+            <p className="text-gray-100 text-lg">🌐 Website:  vinfasthathanh.com</p>
           </div>
         </div>
 

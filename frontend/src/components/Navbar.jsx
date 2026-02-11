@@ -24,6 +24,7 @@ function Navbar() {
           <div className="hidden md:flex space-x-8">
             <Link to="/" className="hover:text-vinfast_light transition font-bold">Trang Chủ</Link>
             <Link to="/products" className="hover:text-vinfast_light transition font-bold">Sản Phẩm</Link>
+            <Link to="/price-table" className="hover:text-vinfast_light transition font-bold">Bảng Giá</Link>
             <Link to="/contact" className="hover:text-vinfast_light transition font-bold">Liên Hệ</Link>
           </div>
 

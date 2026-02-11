@@ -1,20 +1,12 @@
 import React from 'react';
+import Slider from "../components/Slider";
 import { Link } from 'react-router-dom';
 
 function Home() {
   return (
     <div>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-vinfast to-vinfast_light text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-4">VinFast - Tương Lai Xe Điện</h1>
-          <p className="text-2xl mb-8">Công nghệ thông minh, hiệu suất vượt trội</p>
-          <Link to="/products" className="bg-white text-vinfast px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
-            Khám Phá Sản Phẩm
-          </Link>
-        </div>
-      </section>
-
+      {/* Slider */}
+      <Slider /> 
       {/* Featured Products */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
@@ -28,10 +20,10 @@ function Home() {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2">VinFast VF 8</h3>
+              <Link to={`/products/6`}><h3 className="text-2xl hover:underline text-vinfast font-bold mb-2">VinFast VF 8</h3></Link>                
                 <p className="text-gray-600 mb-4">SUV thông minh với thời lượng pin lên đến 500km</p>
                 <p className="text-vinfast text-xl font-bold mb-4">Từ 800.000.000 VND</p>
-                <Link to="/contact" className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
+                <Link to="/contact" state={{ product: "VinFast VF 8" }} className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
               </div>
             </div>
 
@@ -41,10 +33,12 @@ function Home() {
                   <img src={`/images/products/vinfast-vf9.png` || '🚗'} alt="VinFast VF 9" className="h-64 object-contain"/>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2">VinFast VF 9</h3>
+                <Link to={`/products/7`}>
+                <h3 className="text-2xl hover:underline text-vinfast font-bold mb-2">VinFast VF 9</h3>
+                </Link>
                 <p className="text-gray-600 mb-4">SUV hạng sang với công nghệ tự lái mới nhất</p>
                 <p className="text-vinfast text-xl font-bold mb-4">Từ 1.499.000.000 VND</p>
-                <Link to="/contact" className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
+                <Link to="/contact" state={{ product: "VinFast VF 9" }} className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
               </div>
             </div>
 
@@ -56,10 +50,12 @@ function Home() {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2">VinFast VF 3</h3>
+                <Link to={`/products/10`}>
+                <h3 className="text-2xl hover:underline text-vinfast font-bold mb-2">VinFast VF 3</h3>
+                </Link>
                 <p className="text-gray-600 mb-4">Sedan compact giá rẻ, hiệu suất cao</p>
                 <p className="text-vinfast text-xl font-bold mb-4">Từ 299.000.000 VND</p>
-                <Link to="/contact" className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
+                <Link to="/contact" state={{ product: "VinFast VF 3" }} className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
               </div>
             </div>
           </div>
