@@ -15,7 +15,7 @@ async def get_products(db: Session = Depends(get_db)):
         return {
             "success": True,
             "message": "Danh sách sản phẩm",
-            "data": products
+            "data": [Product.from_orm(p) for p in products]
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -31,7 +31,7 @@ async def get_product(product_id: int, db: Session = Depends(get_db)):
         return {
             "success": True,
             "message": "Chi tiết sản phẩm",
-            "data": product
+            "data": Product.from_orm(product)
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

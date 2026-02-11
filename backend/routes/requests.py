@@ -38,7 +38,7 @@ async def create_request(
         db.commit()
         db.refresh(db_request)
 
-        # Thêm task gửi Zalo vào background
+        # Thêm task gửi Telegram vào background
         request_data = {
             "name": request.name,
             "email": request.email,
@@ -48,7 +48,7 @@ async def create_request(
             "created_at": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         }
         
-        background_tasks.add_task(send_zalo_messages, db_request.id, request_data, request.phone, request.name, db)
+        background_tasks.add_task(send_telegram_messages, db_request.id, request_data, request.phone, request.name, db)
 
         return {
             "success": True,
@@ -64,8 +64,8 @@ async def create_request(
         logger.error(f"Lỗi tạo yêu cầu: {str(e)}")
         raise HTTPException(status_code=500, detail="Có lỗi xảy ra khi gửi yêu cầu")
 
-async def send_zalo_messages(request_id: int, request_data: dict, customer_phone: str, customer_name: str, db: Session):
-    """Gửi tin nhắn Zalo cho admin và khách hàng"""
+async def send_telegram_messages(request_id: int, request_data: dict, customer_phone: str, customer_name: str, db: Session):
+    """Gửi tin nhắn Telegram cho admin và khách hàng"""
     try:
         # Gửi cho admin
         admin_result = await TelegramService.send_message_to_admin(request_data)
