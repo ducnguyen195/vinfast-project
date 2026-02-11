@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const API_URL = 'http://localhost:8000/api';
 
 function ContactForm() {
+  const location = useLocation();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    product: 'VinFast VF 8',
+    product: location.state?.product || '',
     message: ''
   });
   const [loading, setLoading] = useState(false);
@@ -37,7 +40,7 @@ function ContactForm() {
           name: '',
           email: '',
           phone: '',
-          product: 'VinFast VF 8',
+          product: '',
           message: ''
         });
 
@@ -60,7 +63,7 @@ function ContactForm() {
 
         {success && (
           <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-            ✅ Yêu cầu của bạn đã được gửi thành công! Chúng tôi sẽ liên hệ qua Zalo trong thời gian sớm nhất.
+            ✅ Yêu cầu của bạn đã được gửi thành công! Chúng tôi sẽ liên hệ trong thời gian sớm nhất.
           </div>
         )}
 
@@ -124,7 +127,9 @@ function ContactForm() {
             >
               <option value="VinFast VF 8">VinFast VF 8 - SUV thông minh</option>
               <option value="VinFast VF 9">VinFast VF 9 - SUV hạng sang</option>
-              <option value="VinFast VF 3">VinFast VF 3</option>
+              <option value="VinFast VF 7">VinFast VF 7 - SUV compact</option>
+              <option value="VinFast VF 6">VinFast VF 6 - Crossover điện</option>
+              <option value="VinFast VF 3">VinFast VF 3 - Sedan compact</option>
               <option value="Other">Khác</option>
             </select>
           </div>
