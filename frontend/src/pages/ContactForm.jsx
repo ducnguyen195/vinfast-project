@@ -158,7 +158,7 @@ function ContactForm() {
         </form>
 
         <p className="text-center text-gray-600 mt-8 text-sm">
-          💬 Chúng tôi sẽ liên hệ bạn qua Zalo trong 24 giờ
+          💬 Chúng tôi sẽ liên hệ bạn ngay khi nhận được yêu cầu 
         </p>
       </div>
     </div>
