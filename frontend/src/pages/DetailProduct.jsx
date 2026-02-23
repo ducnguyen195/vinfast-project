@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8000/api';
+import API_URL, { getImageUrl } from '../api/config';
 
 function DetailProduct() {
   const { id } = useParams();
@@ -29,11 +28,13 @@ function DetailProduct() {
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (!product) return <div className="text-center py-10">Product not found</div>;
 
+  const getImageUrl2 = getImageUrl;  // Reuse from config
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <div className="flex flex-col md:flex-row items-center">
         <img
-          src={`/images/products/${product.image_url}`}
+          src={getImageUrl2(product.image_url)}
           alt={product.name}
           className="w-full md:w-1/2 h-auto rounded-lg mb-4 md:mb-0"
         />

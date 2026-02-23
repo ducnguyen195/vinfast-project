@@ -44,3 +44,23 @@ class Response(BaseModel):
     success: bool
     message: str
     data: Optional[dict] = None
+
+class PostBase(BaseModel):
+    title: str
+    slug: str
+    image_url: Optional[str] = None
+    content: str
+    
+
+
+class PostCreate(PostBase):
+    pass
+
+
+class Post(PostBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
