@@ -9,6 +9,8 @@ import DetailProduct from './pages/DetailProduct';
 import PriceTable from './pages/PriceTable';
 import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
+import Posts from './pages/Posts';
+import DetailPost from './pages/DetailPost';
 
 
 function App() {
@@ -22,6 +24,8 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/price-table" element={<PriceTable />} />
             <Route path="/products/:id" element={<DetailProduct />} />
+            <Route path="/posts" element={<Posts />} />
+            <Route path="/posts/:slug" element={<DetailPost />} />
             <Route path="/contact" element={<ContactForm />} />
             <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/admin"element={localStorage.getItem("admin_token") ? <Admin /> : <Navigate to="/admin-login" />}/>

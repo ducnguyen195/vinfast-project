@@ -31,6 +31,7 @@ function Navbar() {
             <Link to="/" className="hover:text-vinfast_light transition font-bold">Trang Chủ</Link>
             <Link to="/products" className="hover:text-vinfast_light transition font-bold">Sản Phẩm</Link>
             <Link to="/price-table" className="hover:text-vinfast_light transition font-bold">Bảng Giá</Link>
+            <Link to="/posts" className="hover:text-vinfast_light transition font-bold">Bài Viết</Link>
             <Link to="/contact" className="hover:text-vinfast_light transition font-bold">Liên Hệ</Link>
           </div>
 
@@ -51,6 +52,7 @@ function Navbar() {
             <Link to="/" className="block px-3 py-2 hover:bg-vinfast_light rounded">Trang Chủ</Link>
             <Link to="/products" className="block px-3 py-2 hover:bg-vinfast_light rounded">Sản Phẩm</Link>
             <Link to="/contact" className="block px-3 py-2 hover:bg-vinfast_light rounded">Liên Hệ</Link>
+            <Link to="/posts" className="block px-3 py-2 hover:bg-vinfast_light rounded">Bài Viết</Link>
           </div>
         )}
       </div>

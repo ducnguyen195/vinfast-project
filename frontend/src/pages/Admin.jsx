@@ -2,24 +2,68 @@ import { useState, useEffect } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useNavigate } from "react-router-dom";
+import API_URL, { getImageUrl } from "../api/config";
 
 export default function Admin() {
   const navigate = useNavigate();
-
+  // Products
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState(null); 
   const [content, setContent] = useState("");
+
+  // Posts 
+  const [postTitle, setPostTitle] = useState("");
+  const [postSlug, setPostSlug] = useState("");
+  const [postImageUrl, setPostImageUrl] = useState("");
+  const [postImageFile, setPostImageFile] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [selectedPostId, setSelectedPostId] = useState("");
+  const [prevAutoSlug, setPrevAutoSlug] = useState("");
+  const [activeTab, setActiveTab] = useState("products");
+
+  // auto-generate slug from title when appropriate
+  const slugify = (s) => {
+  if (!s) return "";
+
+  return s
+    .toString()
+    .normalize("NFD")                    // tách dấu khỏi chữ
+    .replace(/[\u0300-\u036f]/g, "")     // xoá dấu
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  };
+
+
+  // when title changes, update slug only if user didn't customize it
+  useEffect(() => {
+    const auto = slugify(postTitle);
+    if (!postSlug || postSlug === prevAutoSlug) {
+      setPostSlug(auto);
+      setPrevAutoSlug(auto);
+    }
+  }, [postTitle]);
 
   const [products, setProducts] = useState([]);
   const [selectedId, setSelectedId] = useState("");
 
   // load list sản phẩm
   useEffect(() => {
-    fetch("http://localhost:8000/api/products")
+    fetch(`${API_URL}/products`)
       .then(res => res.json())
       .then(data => setProducts(data.data));
+    // load posts for admin
+    fetch(`${API_URL}/posts`)
+      .then(res => res.json())
+      .then(data => setPosts(data.data || []));
   }, []);
 
   const handleSelectProduct = async (id) => {
@@ -29,45 +73,49 @@ export default function Admin() {
       setName("");
       setDescription("");
       setPrice("");
-      setImageUrl("");
+      setImageUrl(""); 
+      setImageFile(null);   
       setContent("");
       return;
     }
 
-    const res = await fetch(`http://localhost:8000/api/products/${id}`);
+    const res = await fetch(`${API_URL}/products/${id}`);
     const result = await res.json();
 
     setName(result.data.name || "");
     setDescription(result.data.description || "");
     setPrice(result.data.price || "");
     setImageUrl(result.data.image_url || "");
+    setImageFile(null);
     setContent(result.data.content || "");
   };
 
   const handleSubmit = async () => {
-    const payload = {
-      name,
-      description,
-      price: Number(price),
-      image_url: imageUrl,
-      content,
-    };
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("content", content);
 
-    let url = "http://localhost:8000/api/products";
+    if (imageFile) {
+      formData.append("file", imageFile);
+    }
+
+
+    let url = `${API_URL}/products`;
     let method = "POST";
 
     if (selectedId) {
-      url = `http://localhost:8000/api/products/${selectedId}`;
+      url = `${API_URL}/products/${selectedId}`;
       method = "PUT";
     }
 
     const res = await fetch(url, {
       method,
       headers: {
-        "Content-Type": "application/json",
         "admin-token": localStorage.getItem("admin_token"),
       },
-      body: JSON.stringify(payload),
+      body: formData,
     });
 
     const data = await res.json();
@@ -75,13 +123,73 @@ export default function Admin() {
     window.location.reload();
   };
 
+  // Posts handlers
+  const handleSelectPost = async (id) => {
+    setSelectedPostId(id);
+
+    if (!id) {
+      setPostTitle("");
+      setPostSlug("");
+      setPostImageUrl("");
+      setPostImageFile(null);
+      setContent("");
+      return;
+    }
+
+    const res = await fetch(`${API_URL}/posts/slug/${posts.find(p=>p.id==id)?.slug}`);
+    const result = await res.json();
+    const p = result.data;
+    setPostTitle(p.title || "");
+    setPostSlug(p.slug || "");
+    setPrevAutoSlug(p.slug || "");
+    setPostImageUrl(p.image_url || "");
+    setPostImageFile(null);
+    setContent(p.content || "");
+  };
+
+  const handleSubmitPost = async () => {
+    const formData = new FormData();
+    formData.append("title", postTitle);
+    formData.append("slug", postSlug);
+    formData.append("content", content);
+    if (postImageFile) {
+      formData.append("file", postImageFile);
+    } else if (postImageUrl) {
+      formData.append("image_url", postImageUrl);
+    }
+
+    let url = `${API_URL}/posts/posts`;
+    let method = "POST";
+
+    if (selectedPostId) {
+      url = `${API_URL}/posts/posts/${selectedPostId}`;
+      method = "PUT";
+    }
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        "admin-token": localStorage.getItem("admin_token"),
+      },
+      body: formData,
+    });
+
+    const data2 = await res.json();
+    alert(selectedPostId ? "Cập nhật bài viết thành công!" : "Tạo bài viết thành công!");
+    window.location.reload();
+  };
+
   return (
     <div className="max-w-3xl mx-auto mt-10 bg-white shadow-lg rounded-xl p-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">
-          {selectedId ? "Admin - Sửa sản phẩm" : "Admin - Tạo sản phẩm"}
-        </h2>
+        <div>
+          <h2 className="text-2xl font-bold">Admin</h2>
+          <div className="mt-2 flex gap-3">
+            <button onClick={()=>setActiveTab('products')} className={`px-3 py-1 rounded ${activeTab==='products'?'bg-vinfast text-white':'bg-gray-300'}`}>Sản phẩm</button>
+            <button onClick={()=>setActiveTab('posts')} className={`px-3 py-1 rounded ${activeTab==='posts'?'bg-vinfast text-white':'bg-gray-300'}`}>Bài viết</button>
+          </div>
+        </div>
 
         <button
           onClick={() => {
@@ -93,84 +201,139 @@ export default function Admin() {
           Logout
         </button>
       </div>
+      {/* PRODUCT*/}
+      {activeTab === 'products' && (
+        <>
+          {/* SELECT SẢN PHẨM */}
+          <div className="mb-6">
+            <label className="block font-semibold mb-2">Chọn sản phẩm để sửa</label>
+            <select
+              value={selectedId}
+              onChange={(e) => handleSelectProduct(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            >
+              <option value="">-- Tạo sản phẩm mới --</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.id} - {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      {/* SELECT SẢN PHẨM */}
-      <div className="mb-6">
-        <label className="block font-semibold mb-2">Chọn sản phẩm để sửa</label>
-        <select
-          value={selectedId}
-          onChange={(e) => handleSelectProduct(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-3"
-        >
-          <option value="">-- Tạo sản phẩm mới --</option>
-          {products.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.id} - {p.name}
-            </option>
-          ))}
-        </select>
-      </div>
+          {/* Tên */}
+          <div className="mb-5">
+            <label className="block font-semibold mb-2">Tên sản phẩm</label>
+            <input
+              value={name}
+              placeholder ="Nhập tên sản phẩm"
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            />
+          </div>
 
-      {/* Tên */}
-      <div className="mb-5">
-        <label className="block font-semibold mb-2">Tên sản phẩm</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-3"
-        />
-      </div>
+          {/* Mô tả */}
+          <div className="mb-5">
+            <label className="block font-semibold mb-2">Mô tả ngắn</label>
+            <input
+              value={description}
+              placeholder ="Nhập mô tả ngắn"
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            />
+          </div>
 
-      {/* Mô tả */}
-      <div className="mb-5">
-        <label className="block font-semibold mb-2">Mô tả ngắn</label>
-        <input
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-3"
-        />
-      </div>
+          {/* Giá */}
+          <div className="mb-5">
+            <label className="block font-semibold mb-2">Giá</label>
+            <input
+              value={price}
+              placeholder ="Nhập giá sản phẩm"
+              onChange={(e) => setPrice(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            />
+          </div>
 
-      {/* Giá */}
-      <div className="mb-5">
-        <label className="block font-semibold mb-2">Giá</label>
-        <input
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-3"
-        />
-      </div>
+          {/* Ảnh */}
+          <div className="mb-5">
+            <label className="block font-semibold mb-2">Ảnh đại diện</label>
+           {imageUrl && !imageFile && (<img src={getImageUrl(imageUrl)} className="w-40 mt-3 rounded" />)}
+            <input type ="file"  onChange={(e) => setImageFile(e.target.files[0])} className="w-full border border-gray-300 rounded-lg p-3"/>
+          </div>
 
-      {/* Ảnh */}
-      <div className="mb-5">
-        <label className="block font-semibold mb-2">Ảnh đại diện</label>
-        <input
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg p-3"
-        />
-      </div>
+          {/* CKEditor */}
+          <div className="mb-6">
+            <label className="block font-semibold mb-2">Nội dung chi tiết</label>
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
+                <CKEditor
+                editor={ClassicEditor}  data={content}  onChange={(event, editor) => { setContent(editor.getData());}}/>
+            </div>
+          </div>
 
-      {/* CKEditor */}
-      <div className="mb-6">
-        <label className="block font-semibold mb-2">Nội dung chi tiết</label>
-        <div className="border border-gray-300 rounded-lg overflow-hidden">
-          <CKEditor
-            editor={ClassicEditor}
-            data={content}
-            onChange={(event, editor) => {
-              setContent(editor.getData());
-            }}
-          />
-        </div>
-      </div>
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg"
+          >
+            {selectedId ? "Cập nhật sản phẩm" : "Lưu sản phẩm"}
+          </button>
+        </>
+      )}
 
-      <button
-        onClick={handleSubmit}
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg"
-      >
-        {selectedId ? "Cập nhật sản phẩm" : "Lưu sản phẩm"}
-      </button>
+      {activeTab === 'posts' && (
+        <>
+          {/* POSTS */}
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">Chọn bài viết để sửa</label>
+            <select
+              value={selectedPostId}
+              onChange={(e) => handleSelectPost(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            >
+              <option value="">-- Tạo bài viết mới --</option>
+              {posts.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.id} - {p.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">Tiêu đề</label>
+            <input value={postTitle} onChange={(e)=>setPostTitle(e.target.value)} className="w-full border border-gray-300 rounded-lg p-3" />
+          </div>
+
+          <div className="mb-4 grid grid-cols-1 gap-4">
+            <div>
+              <label className="block font-semibold mb-2">Slug</label>
+              <input value={postSlug} onChange={(e)=>setPostSlug(e.target.value)} className="w-full border border-gray-300 rounded-lg p-3" />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block font-semibold mb-2">Ảnh đại diện</label>
+            {postImageUrl && !postImageFile && (<img src={getImageUrl(postImageUrl)} className="w-40 mt-2 rounded" />)}
+            <input type="file" onChange={(e) => setPostImageFile(e.target.files[0])} className="w-full border border-gray-300 rounded-lg p-3 mt-2" />
+          </div>
+
+          <div className="mb-6">
+            <label className="block font-semibold mb-2">Nội dung bài viết</label>
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
+              <CKEditor
+                editor={ClassicEditor}
+                data={content}
+                onChange={(event, editor) => {
+                  setContent(editor.getData());
+                }}
+              />
+            </div>
+          </div>
+
+          <button onClick={handleSubmitPost} className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg">
+            {selectedPostId ? 'Cập nhật bài viết' : 'Tạo bài viết mới'}
+          </button>
+        </>
+      )}
     </div>
   );
 }

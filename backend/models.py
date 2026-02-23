@@ -27,3 +27,15 @@ class CustomerRequest(Base):
     telegram_sent = Column(String(50), default="pending")  # pending, sent, failed
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Post(Base):
+    __tablename__ = "posts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), index=True)
+    slug = Column(String(255), unique=True, index=True)
+    image_url = Column(String(500))
+    content = Column(Text)
+    author = Column(String(100))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
