@@ -7,24 +7,31 @@ function Navbar() {
   return (
     <nav className="bg-vinfast text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-24">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <div className="flex items-center space-x-3">
-              <img src="/images/logo/Logo-Full.png" alt="VinFast" className="h-16 w-auto" />
-              <div className="hidden sm:block h-12 w-px bg-gray-300"></div>
-              <div className="flex flex-col leading-none">
-                <span className="text-xl font-semibold leading-3 mb-2">VINFAST NGUYỄN VĂN LINH</span>
-                <span className="text-lg font-semibold"> Quỳnh Hoa :  0986.585.054</span>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <img src="/images/logo/Logo-Full.png" alt="VinFast" className="h-12 sm:h-14 md:h-16 w-auto"/>
+              <div className="hidden sm:block h-10 sm:h-12 w-px bg-gray-300"></div>
+              <div className="flex flex-col leading-tight">
+                <span className="text-xs sm:text-lg md:text-xl font-semibold">
+                  VINFAST NGUYỄN VĂN LINH
+                </span>
+                <span className="text-xs sm:text-base font-semibold">
+                  Quỳnh Hoa: 0986.585.054
+                </span>
               </div>
+
             </div>
           </Link>
+
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
             <Link to="/" className="hover:text-vinfast_light transition font-bold">Trang Chủ</Link>
             <Link to="/products" className="hover:text-vinfast_light transition font-bold">Sản Phẩm</Link>
             <Link to="/price-table" className="hover:text-vinfast_light transition font-bold">Bảng Giá</Link>
+            <Link to="/posts" className="hover:text-vinfast_light transition font-bold">Bài Viết</Link>
             <Link to="/contact" className="hover:text-vinfast_light transition font-bold">Liên Hệ</Link>
           </div>
 
@@ -45,6 +52,7 @@ function Navbar() {
             <Link to="/" className="block px-3 py-2 hover:bg-vinfast_light rounded">Trang Chủ</Link>
             <Link to="/products" className="block px-3 py-2 hover:bg-vinfast_light rounded">Sản Phẩm</Link>
             <Link to="/contact" className="block px-3 py-2 hover:bg-vinfast_light rounded">Liên Hệ</Link>
+            <Link to="/posts" className="block px-3 py-2 hover:bg-vinfast_light rounded">Bài Viết</Link>
           </div>
         )}
       </div>

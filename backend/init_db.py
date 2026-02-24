@@ -34,7 +34,13 @@ def init_db():
         ),
     ]
     
+    # ensure slug is set for seeded products
     for product in products:
+        # simple slugify inline (same logic as routes)
+        slug = product.name.lower()
+        slug = ''.join(ch for ch in slug if ch.isalnum() or ch.isspace() or ch=='-')
+        slug = '-'.join(slug.split())
+        product.slug = slug
         db.add(product)
     
     db.commit()

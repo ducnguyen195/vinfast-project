@@ -9,7 +9,6 @@ const slides = [
 export default function Slider() {
   const [current, setCurrent] = useState(0);
 
-  // Auto chạy
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
@@ -27,8 +26,15 @@ export default function Slider() {
   };
 
   return (
-    <div className="relative w-full h-[900px] overflow-hidden">
-      
+    <div className="relative w-full 
+                    h-[220px] 
+                    sm:h-[320px] 
+                    md:h-[420px] 
+                    lg:h-[600px] 
+                    xl:h-[750px] 
+                    2xl:h-[900px] 
+                    overflow-hidden">
+
       {/* Image */}
       <img
         src={slides[current]}
@@ -39,7 +45,10 @@ export default function Slider() {
       {/* Nút trái */}
       <button
         onClick={prevSlide}
-        className="absolute left-5 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full"
+        className="absolute left-2 md:left-5 top-1/2 -translate-y-1/2 
+                   bg-black/40 text-white 
+                   w-8 h-8 md:w-10 md:h-10 
+                   rounded-full"
       >
         ‹
       </button>
@@ -47,18 +56,21 @@ export default function Slider() {
       {/* Nút phải */}
       <button
         onClick={nextSlide}
-        className="absolute right-5 top-1/2 -translate-y-1/2 bg-black/40 text-white w-10 h-10 rounded-full"
+        className="absolute right-2 md:right-5 top-1/2 -translate-y-1/2 
+                   bg-black/40 text-white 
+                   w-8 h-8 md:w-10 md:h-10 
+                   rounded-full"
       >
         ›
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-5 w-full flex justify-center gap-2">
+      <div className="absolute bottom-3 md:bottom-5 w-full flex justify-center gap-2">
         {slides.map((_, index) => (
           <div
             key={index}
             onClick={() => setCurrent(index)}
-            className={`w-3 h-3 rounded-full cursor-pointer ${
+            className={`w-2 h-2 md:w-3 md:h-3 rounded-full cursor-pointer ${
               current === index ? "bg-white" : "bg-white/40"
             }`}
           />

@@ -7,6 +7,7 @@ class Product(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), index=True)
+    slug = Column(String(255), unique=True, index=True, nullable=True)  # SEO‑friendly URL
     description = Column(Text)
     price = Column(Float)
     image_url = Column(String(500))
@@ -25,5 +26,17 @@ class CustomerRequest(Base):
     message = Column(Text, nullable=True)
     status = Column(String(50), default="pending")  # pending, contacted, completed
     telegram_sent = Column(String(50), default="pending")  # pending, sent, failed
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Post(Base):
+    __tablename__ = "posts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), index=True)
+    slug = Column(String(255), unique=True, index=True)
+    image_url = Column(String(500))
+    content = Column(Text)
+    author = Column(String(100))
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

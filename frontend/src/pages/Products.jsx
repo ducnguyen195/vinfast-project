@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8000/api';
+import API_URL, { getImageUrl } from '../api/config';
+import Seo from '../components/Seo';
 
 function Products() {
   const [products, setProducts] = useState([]);
@@ -25,8 +25,15 @@ function Products() {
     }
   };
 
+  const getImageUrl2 = getImageUrl; // Reuse from config
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-16">
+      <Seo
+        title="Xe VinFast - Danh sách sản phẩm"
+        description="Khám phá bộ sưu tập xe điện VinFast: VF3, VF5, VF8, VF9. Giá tốt nhất, giao nhanh trong ngày."
+        url="https://vinfasthathanh.vn/products"
+      />
       <h1 className="text-5xl font-bold text-center mb-12">Bộ Sưu Tập Xe VinFast</h1>
 
       {loading ? (
@@ -36,10 +43,10 @@ function Products() {
           {products.map((product) => (
             <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition">
               <div className="bg-gradient-to-b from-gray-200 to-gray-300 h-80 flex items-center justify-center text-8xl">
-                <img src={`/images/products/${product.image_url}` || '🚗'} alt={product.name} className="h-64 object-contain"/>
+                <img src={getImageUrl2(product.image_url)} alt={product.name} className="h-64 object-contain"/>
               </div>
               <div className="p-6">
-                <Link to={`/products/${product.id}`} className="text-xl font-medium text-vinfast hover:underline">
+                <Link to={`/products/${product.slug || product.id}`} className="text-xl font-medium text-vinfast hover:underline">
                 <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
                 </Link>
                 <p className="text-gray-600 mb-4">{product.description}</p>
