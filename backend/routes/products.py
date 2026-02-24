@@ -23,13 +23,13 @@ def slugify(text: str) -> str:
     text = re.sub(r"[ùúụủũưừứựửữ]", "u", text)
     text = re.sub(r"[ỳýỵỷỹ]", "y", text)
     text = re.sub(r"đ", "d", text)
-    # strip invalid chars
+    # bỏ khoảng trắng
     text = re.sub(r"[^\w\s-]", "", text)
-    # replace whitespace and underscores with hyphen
+    # thêm dấu gạch giữa
     text = re.sub(r"[\s_-]+", "-", text)
-    # remove leading/trailing hyphens
+    # bỏ dấu gạch ở đầu và cuối
     return re.sub(r"^-+|-+$", "", text)
-# Create uploads directory if it doesn't exist
+# tạo thư mục uploads nếu chưa tồn tại
 UPLOAD_DIR = "uploads/products"
 Path(UPLOAD_DIR).mkdir(parents=True, exist_ok=True)
 
