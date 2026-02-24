@@ -23,7 +23,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
             <Route path="/price-table" element={<PriceTable />} />
-            <Route path="/products/:id" element={<DetailProduct />} />
+            {/* detail product now uses slug instead of numeric id for better SEO */}
+            <Route path="/products/:slug" element={<DetailProduct />} />
             <Route path="/posts" element={<Posts />} />
             <Route path="/posts/:slug" element={<DetailPost />} />
             <Route path="/contact" element={<ContactForm />} />

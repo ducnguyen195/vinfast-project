@@ -7,6 +7,7 @@ from database import Base, engine
 from routes import products, requests as request_routes
 from routes import posts as posts_routes
 from routes import admin
+from routes import upload
 from config import DEBUG
 import logging
 
@@ -14,6 +15,7 @@ import logging
 Path("uploads").mkdir(exist_ok=True)
 Path("uploads/posts").mkdir(exist_ok=True)
 Path("uploads/products").mkdir(exist_ok=True)
+Path("uploads/tinymce").mkdir(exist_ok=True)
 
 # Cấu hình logging
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +31,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Ẩn tài liệu API khi không cần thiết
+app = FastAPI(
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None
+)
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -38,13 +47,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
 # Include routers
 app.include_router(admin.router)
 app.include_router(products.router)
 app.include_router(posts_routes.router)
 app.include_router(request_routes.router)
+app.include_router(upload.router)
 
-# Mount uploads folder for static file serving
+# mount dữ liệu tĩnh cho uploads
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.get("/")

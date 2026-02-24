@@ -34,3 +34,17 @@ def test_health_check():
     response = client.get("/api/health")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+
+
+def test_upload_file():
+    """Uploading an image via the generic upload endpoint should succeed and
+    return a usable URL in the tiny mce folder."""
+    content = b"fake image data"
+    response = client.post(
+        "/api/upload",
+        files={"file": ("test.png", content, "image/png")},
+    )
+    assert response.status_code == 200
+    json_data = response.json()
+    assert "url" in json_data
+    assert json_data["url"].startswith("/uploads/tinymce/")
