@@ -58,17 +58,16 @@ Vui lòng liên hệ với khách hàng sớm nhất!
     async def send_confirmation_to_customer(name: str) -> bool:
         """
         Gửi tin nhắn xác nhận nội bộ (nếu muốn dùng cho admin hoặc group)
-        Telegram không gửi theo số điện thoại nên bỏ tham số phone
         """
         try:
             message_content = f"""
-Xin chào,
+            Xin chào,
 
-Khách hàng *{name}* vừa gửi yêu cầu thông tin 🚗
+            Khách hàng *{name}* vừa gửi yêu cầu thông tin 🚗
 
-Hệ thống đã ghi nhận thành công.
+            Hệ thống đã ghi nhận thành công.
 
-<==============================>
+            <==============================>
             """.strip()
 
             async with aiohttp.ClientSession() as session:
