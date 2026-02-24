@@ -7,6 +7,7 @@ class Product(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), index=True)
+    slug = Column(String(255), unique=True, index=True, nullable=True)  # SEO‑friendly URL
     description = Column(Text)
     price = Column(Float)
     image_url = Column(String(500))

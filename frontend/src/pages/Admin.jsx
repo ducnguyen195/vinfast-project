@@ -1,13 +1,35 @@
 import { useState, useEffect } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { Editor } from '@tinymce/tinymce-react';
 import { useNavigate } from "react-router-dom";
 import API_URL, { getImageUrl } from "../api/config";
+
+// helper for TinyMCE image uploads
+const handleImageUpload = (blobInfo) => {
+  const data = new FormData();
+  data.append('file', blobInfo.blob(), blobInfo.filename());
+
+  return fetch(`${API_URL}/upload`, {
+    method: 'POST',
+    body: data,
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Upload failed');
+      return res.json();
+    })
+    .then(res => {
+      if (!res.location) {
+        throw new Error('Invalid response');
+      }
+      return res.location;
+    });
+};
 
 export default function Admin() {
   const navigate = useNavigate();
   // Products
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [prevAutoSlugProduct, setPrevAutoSlugProduct] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -21,7 +43,7 @@ export default function Admin() {
   const [postImageFile, setPostImageFile] = useState(null);
   const [posts, setPosts] = useState([]);
   const [selectedPostId, setSelectedPostId] = useState("");
-  const [prevAutoSlug, setPrevAutoSlug] = useState("");
+  const [prevAutoSlugPost, setPrevAutoSlugPost] = useState("");
   const [activeTab, setActiveTab] = useState("products");
 
   // auto-generate slug from title when appropriate
@@ -43,14 +65,23 @@ export default function Admin() {
   };
 
 
-  // when title changes, update slug only if user didn't customize it
+  // when title changes, update slug only if user didn't customize it (for posts)
   useEffect(() => {
     const auto = slugify(postTitle);
-    if (!postSlug || postSlug === prevAutoSlug) {
+    if (!postSlug || postSlug === prevAutoSlugPost) {
       setPostSlug(auto);
-      setPrevAutoSlug(auto);
+      setPrevAutoSlugPost(auto);
     }
   }, [postTitle]);
+
+  // same for products
+  useEffect(() => {
+    const auto = slugify(name);
+    if (!slug || slug === prevAutoSlugProduct) {
+      setSlug(auto);
+      setPrevAutoSlugProduct(auto);
+    }
+  }, [name]);
 
   const [products, setProducts] = useState([]);
   const [selectedId, setSelectedId] = useState("");
@@ -71,6 +102,7 @@ export default function Admin() {
 
     if (!id) {
       setName("");
+      setSlug("");
       setDescription("");
       setPrice("");
       setImageUrl(""); 
@@ -83,6 +115,7 @@ export default function Admin() {
     const result = await res.json();
 
     setName(result.data.name || "");
+    setSlug(result.data.slug || "");
     setDescription(result.data.description || "");
     setPrice(result.data.price || "");
     setImageUrl(result.data.image_url || "");
@@ -93,6 +126,7 @@ export default function Admin() {
   const handleSubmit = async () => {
     const formData = new FormData();
     formData.append("name", name);
+    formData.append("slug", slug);
     formData.append("description", description);
     formData.append("price", price);
     formData.append("content", content);
@@ -141,7 +175,7 @@ export default function Admin() {
     const p = result.data;
     setPostTitle(p.title || "");
     setPostSlug(p.slug || "");
-    setPrevAutoSlug(p.slug || "");
+    setPrevAutoSlugPost(p.slug || "");
     setPostImageUrl(p.image_url || "");
     setPostImageFile(null);
     setContent(p.content || "");
@@ -180,7 +214,7 @@ export default function Admin() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 bg-white shadow-lg rounded-xl p-8">
+    <div className="max-w-5xl mx-auto mt-10 bg-white shadow-lg rounded-xl p-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -231,6 +265,17 @@ export default function Admin() {
               className="w-full border border-gray-300 rounded-lg p-3"
             />
           </div>
+          {/* Slug (URL thân thiện) */}
+          <div className="mb-5">
+            <label className="block font-semibold mb-2">Slug (URL)</label>
+            <input
+              value={slug}
+              placeholder ="tên-san-pham"
+              onChange={(e) => setSlug(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg p-3"
+            />
+            <p className="text-sm text-gray-500 mt-1">Tự động sinh từ tên nếu để trống</p>
+          </div>
 
           {/* Mô tả */}
           <div className="mb-5">
@@ -261,12 +306,32 @@ export default function Admin() {
             <input type ="file"  onChange={(e) => setImageFile(e.target.files[0])} className="w-full border border-gray-300 rounded-lg p-3"/>
           </div>
 
-          {/* CKEditor */}
+          {/* TinyMCE editor */}
           <div className="mb-6">
             <label className="block font-semibold mb-2">Nội dung chi tiết</label>
             <div className="border border-gray-300 rounded-lg overflow-hidden">
-                <CKEditor
-                editor={ClassicEditor}  data={content}  onChange={(event, editor) => { setContent(editor.getData());}}/>
+                <Editor
+                  value={content}
+                  apiKey="tfdst35n5912ndph3q5a1pb7dxi00enphokpn1m0hlvjr1ge"
+                  init={{
+                    height: 400,
+                    menubar: false,
+                    plugins: [
+                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+                      'preview', 'anchor', 'searchreplace', 'visualblocks',
+                      'code', 'fullscreen', 'insertdatetime', 'media', 'table'
+                    ],
+                    toolbar:
+                      'undo redo |fontsize formatselect forecolor | bold italic backcolor | alignleft aligncenter table alignright alignjustify | bullist numlist outdent indent | removeformat | image media link',
+                    images_upload_handler: handleImageUpload,
+                    automatic_uploads: true,
+                    media_live_embeds: true,
+                    media_filter_html: false,
+                    extended_valid_elements:
+                      'video[controls|src|width|height|autoplay|loop|muted|poster],source[src|type]',
+                  }}
+                  onEditorChange={(newContent) => setContent(newContent)}
+                />
             </div>
           </div>
 
@@ -319,11 +384,27 @@ export default function Admin() {
           <div className="mb-6">
             <label className="block font-semibold mb-2">Nội dung bài viết</label>
             <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <CKEditor
-                editor={ClassicEditor}
-                data={content}
-                onChange={(event, editor) => {
-                  setContent(editor.getData());
+              <Editor
+                value={content}
+                init={{
+                  height: 400,
+                  menubar: false,
+                  plugins: [
+                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+                      'preview', 'anchor', 'searchreplace', 'visualblocks',
+                      'code', 'fullscreen', 'insertdatetime', 'media', 'table'
+                    ],
+                    toolbar:
+                      'undo redo |fontsize formatselect forecolor | bold italic backcolor | alignleft aligncenter table alignright alignjustify | bullist numlist outdent indent | removeformat | image media link',
+                  images_upload_handler: handleImageUpload,
+                  automatic_uploads: true,
+                  media_live_embeds: true,
+                  media_filter_html: false,
+                  extended_valid_elements:
+                      'video[controls|src|width|height|autoplay|loop|muted|poster],source[src|type]',
+                }}
+                onEditorChange={(newContent) => {
+                  setContent(newContent);
                 }}
               />
             </div>

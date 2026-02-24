@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import Seo from '../components/Seo';
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -57,6 +58,11 @@ function ContactForm() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-16">
+      <Seo
+        title="Liên hệ tư vấn – VinFast Hà Thành"
+        description="Gửi yêu cầu tư vấn, báo giá và hỗ trợ mua xe VinFast chính hãng. Hotline 0986 585 054."
+        url="https://vinfasthathanh.vn/contact"
+      />
       <div className="bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-4xl font-bold text-center mb-2">Yêu Cầu Thông Tin</h1>
         <p className="text-center text-gray-600 mb-8">Liên hệ với chúng tôi để nhận thông tin chi tiết</p>

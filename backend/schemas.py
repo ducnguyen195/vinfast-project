@@ -8,6 +8,7 @@ class ProductBase(BaseModel):
     price: float
     image_url: Optional[str] = None
     content: Optional[str] = None 
+    slug: Optional[str] = None  # we include slug in responses (read-only)
 
 
 class ProductCreate(ProductBase):

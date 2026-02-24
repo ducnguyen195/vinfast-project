@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API_URL, { getImageUrl } from "../api/config";
+import Seo from '../components/Seo';
 
 export default function Posts() {
   const [posts, setPosts] = useState([]);
@@ -16,6 +17,11 @@ export default function Posts() {
 
   return (
     <div className="max-w-5xl mx-auto mt-8">
+      <Seo
+        title="Tin tức & bài viết VinFast"
+        description="Tổng hợp bài viết, tin tức và cẩm nang hữu ích cho chủ xe VinFast."
+        url="https://vinfasthathanh.vn/posts"
+      />
       <h1 className="text-2xl font-bold mb-6">Bài viết</h1>
 
       <div className="space-y-6">
