@@ -1,31 +1,41 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/router';
+import API_URL from '../api/config';
+import Seo from '../components/Seo';
+import { absoluteUrl } from '../utils/seo';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleLogin = async () => {
-    const res = await fetch("http://localhost:8000/admin/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
+    setError("");
+    try {
+      const res = await fetch(`${API_URL}/admin/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
 
-    if (res.ok && data.success) {
-        localStorage.setItem("admin_token", data.token);
-        window.location.href = "/admin";
-    } else {
-      alert("Sai tài khoản");
+      if (res.ok && data.success) {
+          localStorage.setItem("admin_token", data.token);
+          router.push('/admin');
+      } else {
+        setError("Sai tai khoan hoac mat khau");
+      }
+    } catch (e) {
+      setError("Khong ket noi duoc API /admin/login");
     }
   };
 
   return (
     <div className="p-6 max-w-md mx-auto">
+      <Seo title="Admin Login" url={absoluteUrl('/admin-login')} noindex />
       <input
         placeholder="Username"
         className="border p-2 w-full mb-3"
@@ -40,6 +50,7 @@ export default function AdminLogin() {
       />
 
       <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={handleLogin}>Login</button>
+      {error && <p className="mt-3 text-red-600">{error}</p>}
       
     </div>
   );

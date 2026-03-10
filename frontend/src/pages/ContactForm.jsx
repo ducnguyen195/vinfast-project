@@ -1,23 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { useRouter } from 'next/router';
+import API_URL from '../api/config';
 import Seo from '../components/Seo';
-
-const API_URL = 'http://localhost:8000/api';
+import { absoluteUrl } from '../utils/seo';
 
 function ContactForm() {
-  const location = useLocation();
+  const router = useRouter();
+  const queryProduct = typeof router.query.product === 'string' ? router.query.product : '';
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    product: location.state?.product || '',
+    product: queryProduct || 'VinFast VF 8',
     message: ''
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!queryProduct) return;
+    setFormData((prev) => ({ ...prev, product: queryProduct }));
+  }, [queryProduct]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,7 +67,7 @@ function ContactForm() {
       <Seo
         title="Liên hệ tư vấn – VinFast Hà Thành"
         description="Gửi yêu cầu tư vấn, báo giá và hỗ trợ mua xe VinFast chính hãng. Hotline 0986 585 054."
-        url="https://vinfasthathanh.vn/contact"
+        url={absoluteUrl('/contact')}
       />
       <div className="bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-4xl font-bold text-center mb-2">Yêu Cầu Thông Tin</h1>

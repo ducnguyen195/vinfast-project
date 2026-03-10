@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import axios from 'axios';
 import API_URL, { getImageUrl } from '../api/config';
 import Seo from '../components/Seo';
+import { absoluteUrl } from '../utils/seo';
 
-function DetailProduct() {
-  const { slug } = useParams();
+function DetailProduct({ initialProduct = null }) {
+  const router = useRouter();
+  const { slug } = router.query;
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState(initialProduct);
+  const [loading, setLoading] = useState(!initialProduct);
 
   useEffect(() => {
+    if (!slug || initialProduct) return;
     fetchProduct();
-  }, [slug]);
+  }, [slug, initialProduct]);
 
   const fetchProduct = async () => {
     try {
@@ -31,7 +35,9 @@ function DetailProduct() {
 
   const getImageUrl2 = getImageUrl;  // Reuse from config
 
-  const pageUrl = window.location.href;
+  const pageUrl = typeof window !== 'undefined'
+    ? window.location.href
+    : absoluteUrl(`/products/${slug || ''}`);
   const pageTitle = product.name;
   const pageDescription = product.description || pageTitle;
   const pageImage = getImageUrl2(product.image_url);
@@ -59,7 +65,7 @@ function DetailProduct() {
                   currency: "VND",
                 }).format(product.price)}
               </p>
-              <Link to="/contact" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+              <Link href="/contact" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                 Liên Hệ Ngay
               </Link>
             </div>
@@ -88,7 +94,7 @@ function DetailProduct() {
                 <a  href="tel:0986585054" className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition rounded-full py-2 font-semibold">
                   0986.585.054
                 </a>
-                <Link to="/contact" className="flex items-center justify-center bg-blue-500 hover:bg-blue-600 transition rounded-full py-2 font-semibold">
+                <Link href="/contact" className="flex items-center justify-center bg-blue-500 hover:bg-blue-600 transition rounded-full py-2 font-semibold">
                   <button >
                     BÁO GIÁ NHANH
                   </button>

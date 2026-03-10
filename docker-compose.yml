@@ -8,8 +8,8 @@ services:
       POSTGRES_USER: vinfast_user
       POSTGRES_PASSWORD: vinfast_password
       POSTGRES_DB: vinfast
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,38 +18,25 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: vinfast_backend
-    environment:
-      DATABASE_URL: postgresql://vinfast_user:vinfast_password@postgres:5432/vinfast
-      DEBUG: "True"
-    ports:
-      - "8000:8000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-      - ./backend/uploads:/app/uploads
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-
   frontend:
     build:
-      context: ./frontend
+      context: .
       dockerfile: Dockerfile
     container_name: vinfast_frontend
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: http://localhost:8000/api
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: /api
+      DATABASE_URL: postgresql://vinfast_user:vinfast_password@postgres:5432/vinfast
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: Admin@1234
+      ADMIN_TOKEN: vinfast_admin_quynhhoa_140894@#
     depends_on:
-      - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres_data:

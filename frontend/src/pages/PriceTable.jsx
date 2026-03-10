@@ -1,3 +1,6 @@
+import Seo from '../components/Seo';
+import { absoluteUrl } from '../utils/seo';
+
 const cars = [
     {
     name: "Vinfast VF3",
@@ -85,6 +88,11 @@ const cars = [
 export default function PriceSection() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 space-y-16">
+      <Seo
+        title="Bảng giá xe VinFast mới nhất"
+        description="Cập nhật bảng giá VinFast VF3, VF5, VF6, VF7, VF8, VF9 mới nhất cùng ưu đãi tại VinFast Hà Thành."
+        url={absoluteUrl('/price-table')}
+      />
 
       {cars.map((car, idx) => (
         <div key={idx}>

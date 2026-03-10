@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import API_URL, { getImageUrl } from "../api/config";
 import Seo from '../components/Seo';
+import { absoluteUrl } from '../utils/seo';
 
-export default function Posts() {
-  const [posts, setPosts] = useState([]);
+export default function Posts({ initialPosts = [] }) {
+  const [posts, setPosts] = useState(initialPosts);
 
   useEffect(() => {
+    if (initialPosts.length > 0) return;
+
     fetch(`${API_URL}/posts`)
       .then((res) => res.json())
       .then((data) => setPosts(data.data || []))
       .catch((err) => console.error(err));
-  }, []);
+  }, [initialPosts]);
 
   const getImageUrl2 = getImageUrl;  // Reuse from config
 
@@ -20,7 +23,7 @@ export default function Posts() {
       <Seo
         title="Tin tức & bài viết VinFast"
         description="Tổng hợp bài viết, tin tức và cẩm nang hữu ích cho chủ xe VinFast."
-        url="https://vinfasthathanh.vn/posts"
+        url={absoluteUrl('/posts')}
       />
       <h1 className="text-2xl font-bold mb-6">Bài viết</h1>
 
@@ -32,7 +35,7 @@ export default function Posts() {
                 <img src={getImageUrl2(p.image_url)} alt={p.title} className="w-64 h-40 object-cover rounded" />
               )}
               <div>
-                <Link to={`/posts/${p.slug}`} className="text-lg font-semibold hover:text-vinfast_light">
+                <Link href={`/posts/${p.slug}`} className="text-lg font-semibold hover:text-vinfast_light">
                   {p.title}
                 </Link>
                 <p className="text-sm text-gray-600 mt-2" dangerouslySetInnerHTML={{ __html: p.content?.slice(0, 200) + '...' }} />

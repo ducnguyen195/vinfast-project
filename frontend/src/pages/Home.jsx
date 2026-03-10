@@ -1,7 +1,8 @@
 import React from 'react';
+import Link from 'next/link';
 import Slider from "../components/Slider";
-import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
+import { absoluteUrl } from '../utils/seo';
 
 function Home() {
   return (
@@ -9,7 +10,7 @@ function Home() {
       <Seo
         title="VinFast Hà Thành - Trang Chủ"
         description="Đại lý chính hãng VinFast tại Hà Thành. Tư vấn, báo giá và giao xe tận nơi. Hotline 0986 585 054."
-        url="https://vinfasthathanh.vn/"
+        url={absoluteUrl('/')}
       />
       {/* Slider */}
       <Slider /> 
@@ -26,10 +27,10 @@ function Home() {
                 </div>
               </div>
               <div className="p-6">
-              <Link to={`/products/vinfast-vf-8`}><h3 className="text-2xl hover:underline text-vinfast font-bold mb-2">VinFast VF 8</h3></Link>                
+              <Link href="/products/vinfast-vf-8"><h3 className="text-2xl hover:underline text-vinfast font-bold mb-2">VinFast VF 8</h3></Link>
                 <p className="text-gray-600 mb-4">SUV thông minh với thời lượng pin lên đến 500km</p>
                 <p className="text-vinfast text-xl font-bold mb-4">Từ 800.000.000 VND</p>
-                <Link to="/contact" state={{ product: "VinFast VF 8" }} className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
+                <Link href="/contact?product=VinFast%20VF%208" className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
               </div>
             </div>
 
@@ -39,12 +40,12 @@ function Home() {
                   <img src={`/images/products/vinfast-vf9.png` || '🚗'} alt="VinFast VF 9" className="h-64 object-contain"/>
               </div>
               <div className="p-6">
-                <Link to={`/products/vinfast-vf-9`}>
+                <Link href="/products/vinfast-vf-9">
                 <h3 className="text-2xl hover:underline text-vinfast font-bold mb-2">VinFast VF 9</h3>
                 </Link>
                 <p className="text-gray-600 mb-4">SUV hạng sang với công nghệ tự lái mới nhất</p>
                 <p className="text-vinfast text-xl font-bold mb-4">Từ 1.499.000.000 VND</p>
-                <Link to="/contact" state={{ product: "VinFast VF 9" }} className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
+                <Link href="/contact?product=VinFast%20VF%209" className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
               </div>
             </div>
 
@@ -56,12 +57,12 @@ function Home() {
                 </div>
               </div>
               <div className="p-6">
-                <Link to={`/products/vinfast-vf-3`}>
+                <Link href="/products/vinfast-vf-3">
                 <h3 className="text-2xl hover:underline text-vinfast font-bold mb-2">VinFast VF 3</h3>
                 </Link>
                 <p className="text-gray-600 mb-4">Sedan compact giá rẻ, hiệu suất cao</p>
                 <p className="text-vinfast text-xl font-bold mb-4">Từ 299.000.000 VND</p>
-                <Link to="/contact" state={{ product: "VinFast VF 3" }} className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
+                <Link href="/contact?product=VinFast%20VF%203" className="text-vinfast hover:text-vinfast_light font-bold">Yêu Cầu Thông Tin →</Link>
               </div>
             </div>
           </div>

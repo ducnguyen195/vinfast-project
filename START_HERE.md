@@ -6,31 +6,12 @@
 # 1. Mở Terminal ở folder project
 cd /path/to/vinfast-project
 
-# 2. Chạy script setup
-chmod +x QUICKSTART.sh
-./QUICKSTART.sh
-
-# 3. Theo dõi hướng dẫn trong script
-
-# 4. Cấu hình Database (nếu cần)
-chmod +x setup_db.sh
-./setup_db.sh
-
-# 5. Cập nhật .env file
-nano backend/.env
-
-# 6. Khởi tạo dữ liệu
-cd backend && source venv/bin/activate
-python init_db.py
-python seed.py
-
-# 7. Chạy project
-cd .. && chmod +x run.sh && ./run.sh
+# 2. Chạy bằng Docker
+docker compose up -d --build
 ```
 
 Truy cập:
-- **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:8000/docs
+- **App + API**: http://localhost:3000
 
 ---
 
@@ -47,10 +28,9 @@ Truy cập:
 
 ## ✨ Tính Năng Chính
 
-✅ **Frontend**: React 18 + TailwindCSS (Responsive, Modern)
-✅ **Backend**: FastAPI (Python, High-performance)
+✅ **Frontend**: Next.js + TailwindCSS
+✅ **Backend API**: Next.js API Routes
 ✅ **Database**: PostgreSQL (Robust, Scalable)
-✅ **Integration**: Zalo Official Account (Customer Communication)
 ✅ **Docker**: Full Docker support
 ✅ **Documentation**: Hoàn chỉnh & Chi tiết
 
@@ -78,8 +58,8 @@ VinFast Website
 
 ```
 vinfast-project/
-├── frontend/          ← React App
-├── backend/           ← FastAPI Server
+├── frontend/          ← Next.js App (UI + API)
+├── Dockerfile         ← Build app image
 ├── docker-compose.yml ← Docker Config
 ├── START_HERE.md      ← Bạn đang đọc file này! 👈
 ├── INDEX.md           ← Điều hướng tài liệu
@@ -105,34 +85,26 @@ Xem [INSTALLATION.md](INSTALLATION.md) để hướng dẫn step-by-step
 ### 🐳 Cách 3: Docker (Dễ Nhất)
 ```bash
 docker-compose up -d
-docker-compose exec backend python init_db.py
 ```
 
 ---
 
 ## ⚙️ Yêu Cầu Hệ Thống
 
-- **Python**: 3.8+
-- **Node.js**: 14+
-- **PostgreSQL**: 12+
-- **Docker** (optional): Latest
+- **Node.js**: 18+
+- **Docker**: Latest
 
 ---
 
 ## 📊 Kiểm Tra Cài Đặt
 
 ```bash
-# Python
-python3 --version
-
 # Node.js
 node --version
 
 # npm
 npm --version
 
-# PostgreSQL
-psql --version
 ```
 
 ---
@@ -154,10 +126,7 @@ psql --version
 
 | URL | Mục Đích |
 |-----|----------|
-| http://localhost:3000 | Frontend (React App) |
-| http://localhost:8000 | Backend (API Server) |
-| http://localhost:8000/docs | API Documentation |
-| http://localhost:8000/redoc | API ReDoc |
+| http://localhost:3000 | App + API |
 
 ---
 
@@ -177,8 +146,7 @@ psql --version
 
 ## 🎓 Học Hỏi Thêm
 
-- **FastAPI**: [fastapi.tiangolo.com](https://fastapi.tiangolo.com/)
-- **React**: [react.dev](https://react.dev/)
+- **Next.js**: [nextjs.org/docs](https://nextjs.org/docs)
 - **TailwindCSS**: [tailwindcss.com](https://tailwindcss.com/)
 - **PostgreSQL**: [postgresql.org/docs](https://www.postgresql.org/docs/)
 - **Docker**: [docker.com/resources](https://www.docker.com/resources)

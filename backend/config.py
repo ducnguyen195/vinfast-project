@@ -9,4 +9,4 @@ DEBUG = os.getenv("DEBUG", "True") == "True"
 
 # Telegram Configuration
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN","8497586776:AAHpX32QqsOsNJbw0h3BGzwPCX5W9tylB0M")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID","6002201117")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID","-5267906759")

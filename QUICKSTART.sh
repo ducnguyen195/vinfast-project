@@ -32,13 +32,6 @@ echo ""
 # Step 1: Check Dependencies
 echo -e "${YELLOW}Step 1: Checking Dependencies...${NC}"
 
-if ! command -v python3 &> /dev/null; then
-    echo -e "${RED}✗ Python3 not found${NC}"
-    echo "Install from: https://www.python.org/downloads/"
-    exit 1
-fi
-echo -e "${GREEN}✓ Python3 found: $(python3 --version)${NC}"
-
 if ! command -v node &> /dev/null; then
     echo -e "${RED}✗ Node.js not found${NC}"
     echo "Install from: https://nodejs.org/"
@@ -52,44 +45,18 @@ if ! command -v npm &> /dev/null; then
 fi
 echo -e "${GREEN}✓ npm found: $(npm --version)${NC}"
 
-# Step 2: Setup Backend
+# Step 2: Setup App
 echo ""
-echo -e "${YELLOW}Step 2: Setting up Backend...${NC}"
+echo -e "${YELLOW}Step 2: Setting up Next.js app...${NC}"
 
-cd backend
-
-if [ ! -d "venv" ]; then
-    echo "Creating virtual environment..."
-    python3 -m venv venv
-fi
-
-source venv/bin/activate 2>/dev/null || . venv/Scripts/activate 2>/dev/null
-
-pip install -q -r requirements.txt
-
-if [ ! -f ".env" ]; then
-    cp ../.env.example .env
-    echo -e "${YELLOW}⚠ .env file created - PLEASE CONFIGURE IT!${NC}"
-fi
-
-echo -e "${GREEN}✓ Backend setup complete${NC}"
-
-# Step 3: Setup Frontend
-echo ""
-echo -e "${YELLOW}Step 3: Setting up Frontend...${NC}"
-
-cd ../frontend
+cd frontend
 
 if [ ! -d "node_modules" ]; then
     echo "Installing npm dependencies..."
     npm install > /dev/null 2>&1
 fi
 
-if [ ! -f ".env" ]; then
-    cp .env.example .env
-fi
-
-echo -e "${GREEN}✓ Frontend setup complete${NC}"
+echo -e "${GREEN}✓ App setup complete${NC}"
 
 cd ..
 
@@ -101,22 +68,14 @@ echo -e "${GREEN}═════════════════════
 echo ""
 echo "Next Steps:"
 echo ""
-echo "1. Configure PostgreSQL:"
-echo "   chmod +x setup_db.sh && ./setup_db.sh"
+echo "1. Update .env file:"
+echo "   nano .env.example"
 echo ""
-echo "2. Update .env file:"
-echo "   nano backend/.env"
-echo ""
-echo "3. Initialize database:"
-echo "   cd backend && source venv/bin/activate && python init_db.py && python seed.py"
-echo ""
-echo "4. Start the project:"
+echo "2. Start the project:"
 echo "   ./run.sh"
 echo ""
 echo "Access:"
-echo "   Frontend:  http://localhost:3000"
-echo "   Backend:   http://localhost:8000"
-echo "   API Docs:  http://localhost:8000/docs"
+echo "   App + API: http://localhost:3000"
 echo ""
 echo "Documentation:"
 echo "   - START_HERE.md        (Quick start)"
