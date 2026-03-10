@@ -19,12 +19,33 @@ export default function DetailPost({ initialPost = null }) {
 
   if (!post) return <div className="max-w-4xl mx-auto mt-8">Đang tải...</div>;
 
-  const pageUrl = typeof window !== 'undefined'
-    ? window.location.href
-    : absoluteUrl(`/posts/${slug || ''}`);
+  const canonicalSlug = post?.slug || slug || '';
+  const pageUrl = absoluteUrl(`/posts/${canonicalSlug}`);
   const pageTitle = post.title;
   const pageDescription = post.excerpt || (post.content ? post.content.replace(/<[^>]+>/g, '').slice(0,160) : '');
   const pageImage = post.image_url ? getImageUrl(post.image_url) : null;
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: pageTitle,
+    description: pageDescription,
+    image: pageImage ? [pageImage] : undefined,
+    author: {
+      '@type': 'Organization',
+      name: 'VinFast Ha Thanh',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'VinFast Ha Thanh',
+      logo: {
+        '@type': 'ImageObject',
+        url: absoluteUrl('/images/logo/favicon.png'),
+      },
+    },
+    mainEntityOfPage: pageUrl,
+    datePublished: post.created_at || undefined,
+    dateModified: post.updated_at || post.created_at || undefined,
+  };
 
   const getImageUrl2 = getImageUrl; // Reuse from config
 
@@ -35,6 +56,8 @@ export default function DetailPost({ initialPost = null }) {
         description={pageDescription}
         url={pageUrl}
         image={pageImage}
+        type="article"
+        jsonLd={articleJsonLd}
       />
       <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
       {post.image_url && <img src={getImageUrl2(post.image_url)} alt={post.title} className="w-full h-auto object-cover rounded mb-4" />}
