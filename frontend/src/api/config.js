@@ -1,10 +1,10 @@
-// API Configuration - uses environment variable for dev/prod
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+// API configuration for Next.js API routes
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export const getImageUrl = (path) => {
   if (!path) return null;
   if (path.startsWith('http')) return path;
-  const baseUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || '';
   return `${baseUrl}/${path}`;
 };
 

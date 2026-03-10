@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import axios from 'axios';
 import API_URL, { getImageUrl } from '../api/config';
 import Seo from '../components/Seo';
+import { absoluteUrl } from '../utils/seo';
 
-function Products() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+function Products({ initialProducts = [] }) {
+  const [products, setProducts] = useState(initialProducts);
+  const [loading, setLoading] = useState(initialProducts.length === 0);
 
   useEffect(() => {
     fetchProducts();
@@ -32,7 +33,7 @@ function Products() {
       <Seo
         title="Xe VinFast - Danh sách sản phẩm"
         description="Khám phá bộ sưu tập xe điện VinFast: VF3, VF5, VF8, VF9. Giá tốt nhất, giao nhanh trong ngày."
-        url="https://vinfasthathanh.vn/products"
+        url={absoluteUrl('/products')}
       />
       <h1 className="text-5xl font-bold text-center mb-12">Bộ Sưu Tập Xe VinFast</h1>
 
@@ -46,13 +47,13 @@ function Products() {
                 <img src={getImageUrl2(product.image_url)} alt={product.name} className="h-64 object-contain"/>
               </div>
               <div className="p-6">
-                <Link to={`/products/${product.slug || product.id}`} className="text-xl font-medium text-vinfast hover:underline">
+                <Link href={`/products/${product.slug || product.id}`} className="text-xl font-medium text-vinfast hover:underline">
                 <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
                 </Link>
                 <p className="text-gray-600 mb-4">{product.description}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-2xl font-bold text-vinfast">{Number(product.price).toLocaleString("vi-VN")} VND</span>
-                  <Link to="/contact" state={{ product: product.name }} className="bg-vinfast text-white px-4 py-2 rounded hover:bg-vinfast_light transition">
+                  <Link href={`/contact?product=${encodeURIComponent(product.name)}`} className="bg-vinfast text-white px-4 py-2 rounded hover:bg-vinfast_light transition">
                     Yêu Cầu
                   </Link>
                 </div>

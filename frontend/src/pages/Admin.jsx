@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Editor } from '@tinymce/tinymce-react';
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/router';
 import API_URL, { getImageUrl } from "../api/config";
+import Seo from '../components/Seo';
+import { absoluteUrl } from '../utils/seo';
 
 // helper for TinyMCE image uploads
 const handleImageUpload = (blobInfo) => {
@@ -25,7 +27,9 @@ const handleImageUpload = (blobInfo) => {
 };
 
 export default function Admin() {
-  const navigate = useNavigate();
+  const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [loadError, setLoadError] = useState("");
   // Products
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -88,14 +92,39 @@ export default function Admin() {
 
   // load list sản phẩm
   useEffect(() => {
+    if (typeof window !== 'undefined' && !localStorage.getItem('admin_token')) {
+      router.replace('/admin-login');
+      return;
+    }
+
+    setIsCheckingAuth(false);
+    setLoadError("");
+
     fetch(`${API_URL}/products`)
       .then(res => res.json())
-      .then(data => setProducts(data.data));
+      .then(data => setProducts(Array.isArray(data.data) ? data.data : []))
+      .catch(() => {
+        setProducts([]);
+        setLoadError("Khong tai duoc du lieu san pham. Kiem tra DATABASE_URL/PostgreSQL.");
+      });
     // load posts for admin
     fetch(`${API_URL}/posts`)
       .then(res => res.json())
-      .then(data => setPosts(data.data || []));
-  }, []);
+      .then(data => setPosts(Array.isArray(data.data) ? data.data : []))
+      .catch(() => {
+        setPosts([]);
+        setLoadError("Khong tai duoc du lieu bai viet. Kiem tra DATABASE_URL/PostgreSQL.");
+      });
+  }, [router]);
+
+  if (isCheckingAuth) {
+    return (
+      <>
+        <Seo title="Admin" url={absoluteUrl('/admin')} noindex />
+        <div className="max-w-5xl mx-auto mt-10 bg-white shadow-lg rounded-xl p-8">Dang kiem tra quyen truy cap...</div>
+      </>
+    );
+  }
 
   const handleSelectProduct = async (id) => {
     setSelectedId(id);
@@ -215,6 +244,7 @@ export default function Admin() {
 
   return (
     <div className="max-w-5xl mx-auto mt-10 bg-white shadow-lg rounded-xl p-8">
+      <Seo title="Admin" url={absoluteUrl('/admin')} noindex />
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -228,13 +258,18 @@ export default function Admin() {
         <button
           onClick={() => {
             localStorage.removeItem("admin_token");
-            navigate("/admin-login");
+            router.push('/admin-login');
           }}
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
         >
           Logout
         </button>
       </div>
+      {loadError && (
+        <div className="mb-6 rounded border border-red-300 bg-red-50 px-4 py-3 text-red-700">
+          {loadError}
+        </div>
+      )}
       {/* PRODUCT*/}
       {activeTab === 'products' && (
         <>

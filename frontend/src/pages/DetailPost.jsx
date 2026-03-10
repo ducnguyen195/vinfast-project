@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useRouter } from 'next/router';
 import API_URL, { getImageUrl } from "../api/config";
 import Seo from '../components/Seo';
+import { absoluteUrl } from '../utils/seo';
 
-export default function DetailPost() {
-  const { slug } = useParams();
-  const [post, setPost] = useState(null);
+export default function DetailPost({ initialPost = null }) {
+  const router = useRouter();
+  const { slug } = router.query;
+  const [post, setPost] = useState(initialPost);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!slug || initialPost) return;
     fetch(`${API_URL}/posts/slug/${slug}`)
       .then((res) => res.json())
       .then((data) => setPost(data.data))
       .catch((err) => console.error(err));
-  }, [slug]);
+  }, [slug, initialPost]);
 
   if (!post) return <div className="max-w-4xl mx-auto mt-8">Đang tải...</div>;
 
-  const pageUrl = window.location.href;
+  const pageUrl = typeof window !== 'undefined'
+    ? window.location.href
+    : absoluteUrl(`/posts/${slug || ''}`);
   const pageTitle = post.title;
   const pageDescription = post.excerpt || (post.content ? post.content.replace(/<[^>]+>/g, '').slice(0,160) : '');
   const pageImage = post.image_url ? getImageUrl(post.image_url) : null;

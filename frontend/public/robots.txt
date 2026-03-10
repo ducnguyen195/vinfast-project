@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# Point to sitemap (update URL to actual domain when deployed)
-Sitemap: https://vinfasthathanh.vn/sitemap.xml
