@@ -12,6 +12,12 @@ function DetailProduct({ initialProduct = null }) {
 
   const [product, setProduct] = useState(initialProduct);
   const [loading, setLoading] = useState(!initialProduct);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
+
+  const normalizeColors = (input) => {
+    if (!Array.isArray(input)) return [];
+    return input.filter((item) => item?.image_url && (item?.name || item?.hex_code));
+  };
 
   useEffect(() => {
     if (!slug || initialProduct) return;
@@ -22,6 +28,9 @@ function DetailProduct({ initialProduct = null }) {
     try {
       const response = await axios.get(`${API_URL}/products/slug/${slug}`);
       setProduct(response.data.data);
+      const nextColors = normalizeColors(response?.data?.data?.colors || []);
+      const defaultIndex = nextColors.findIndex((color) => color.is_default);
+      setSelectedColorIndex(defaultIndex >= 0 ? defaultIndex : 0);
     } catch (error) {
       console.error('Error fetching product:', error);
       setProduct({});
@@ -30,17 +39,26 @@ function DetailProduct({ initialProduct = null }) {
     }
   };
 
+  useEffect(() => {
+    const nextColors = normalizeColors(product?.colors || []);
+    const defaultIndex = nextColors.findIndex((color) => color.is_default);
+    setSelectedColorIndex(defaultIndex >= 0 ? defaultIndex : 0);
+  }, [product?.id]);
+
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (!product) return <div className="text-center py-10">Product not found</div>;
 
   const getImageUrl2 = getImageUrl;  // Reuse from config
+  const colors = normalizeColors(product?.colors || []);
+  const selectedColor = colors[selectedColorIndex] || colors[0] || null;
+  const selectedImage = selectedColor?.image_url || product.image_url;
 
   const pageUrl = typeof window !== 'undefined'
     ? window.location.href
     : absoluteUrl(`/products/${slug || ''}`);
   const pageTitle = product.name;
   const pageDescription = product.description || pageTitle;
-  const pageImage = getImageUrl2(product.image_url);
+  const pageImage = getImageUrl2(selectedImage);
 
   return (
     <div className="mt-10 container mx-auto px-4 sm:px-6 px-4 lg:px-20">
@@ -54,11 +72,36 @@ function DetailProduct({ initialProduct = null }) {
         <div className="lg:col-span-9 bg-white p-4 rounded-lg">
           <div className="flex flex-col md:flex-row items-start gap-4">
             <img
-              src={getImageUrl2(product.image_url)} alt={product.name} className="w-full md:w-1/2 h-auto rounded-lg mb-4 md:mb-0"
+              src={getImageUrl2(selectedImage)} alt={product.name} className="w-full md:w-1/2 h-auto rounded-lg mb-4 md:mb-0"
             />
             <div className="md:ml-6">
               <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
               <p className="text-gray-700 mb-4">{product.description}</p>
+              {!!colors.length && (
+                <div className="mb-4">
+                  <p className="mb-2 text-sm font-semibold text-gray-700">
+                    Màu đang chọn: {selectedColor?.name || 'Mặc định'}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {colors.map((color, index) => {
+                      const isActive = index === selectedColorIndex;
+                      const tone = color.hex_code || '#d9d9d9';
+                      return (
+                        <button
+                          key={`${color.id || color.name}_${index}`}
+                          type="button"
+                          title={color.name || `Màu ${index + 1}`}
+                          onClick={() => setSelectedColorIndex(index)}
+                          className={`flex items-center gap-2 rounded-full border px-2 py-1 ${isActive ? 'border-blue-600' : 'border-gray-300 hover:border-gray-400'}`}
+                        >
+                          <span className="h-7 w-7 rounded-full border" style={{ backgroundColor: tone }} />
+                          <span className="text-sm text-gray-700">{color.name || `Màu ${index + 1}`}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <p className="text-xl font-semibold text-green-600 mb-4">
                 {new Intl.NumberFormat("vi-VN", {
                   style: "currency",
