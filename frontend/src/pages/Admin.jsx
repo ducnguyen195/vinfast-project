@@ -26,6 +26,32 @@ const handleImageUpload = (blobInfo) => {
     });
 };
 
+const createColorDraft = (index = 0) => ({
+  key: `${Date.now()}_${index}_${Math.random().toString(36).slice(2, 8)}`,
+  name: '',
+  hex_code: '#d9d9d9',
+  image_url: '',
+  file: null,
+  is_default: index === 0,
+});
+
+const uploadImageFile = async (file) => {
+  const data = new FormData();
+  data.append('file', file, file.name || `color-${Date.now()}.png`);
+
+  const res = await fetch(`${API_URL}/upload`, {
+    method: 'POST',
+    body: data,
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json?.location) {
+    throw new Error(json?.detail || 'Upload ảnh màu thất bại');
+  }
+
+  return json.location;
+};
+
 export default function Admin() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -37,7 +63,7 @@ export default function Admin() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [imageFile, setImageFile] = useState(null); 
+  const [colorOptions, setColorOptions] = useState([createColorDraft(0)]);
   const [content, setContent] = useState("");
 
   // Posts 
@@ -135,7 +161,7 @@ export default function Admin() {
       setDescription("");
       setPrice("");
       setImageUrl(""); 
-      setImageFile(null);   
+      setColorOptions([createColorDraft(0)]);
       setContent("");
       return;
     }
@@ -148,21 +174,98 @@ export default function Admin() {
     setDescription(result.data.description || "");
     setPrice(result.data.price || "");
     setImageUrl(result.data.image_url || "");
-    setImageFile(null);
+    const colors = Array.isArray(result?.data?.colors) ? result.data.colors : [];
+    if (colors.length) {
+      setColorOptions(
+        colors.map((color, index) => ({
+          key: `${color.id || 'db'}_${index}_${Date.now()}`,
+          name: color.name || `Mau ${index + 1}`,
+          hex_code: color.hex_code || '#d9d9d9',
+          image_url: color.image_url || '',
+          file: null,
+          is_default: Boolean(color.is_default),
+        }))
+      );
+    } else {
+      setColorOptions([
+        {
+          ...createColorDraft(0),
+          name: 'Mau mac dinh',
+          image_url: result.data.image_url || '',
+          is_default: true,
+        },
+      ]);
+    }
     setContent(result.data.content || "");
   };
 
+  const handleAddColor = () => {
+    setColorOptions((prev) => [...prev, createColorDraft(prev.length)]);
+  };
+
+  const handleRemoveColor = (key) => {
+    setColorOptions((prev) => {
+      const next = prev.filter((color) => color.key !== key);
+      if (!next.length) return [createColorDraft(0)];
+      if (!next.some((color) => color.is_default)) {
+        next[0] = { ...next[0], is_default: true };
+      }
+      return next;
+    });
+  };
+
+  const handleColorChange = (key, field, value) => {
+    setColorOptions((prev) => prev.map((color) => {
+      if (color.key !== key) return color;
+      return { ...color, [field]: value };
+    }));
+  };
+
+  const handleSetDefaultColor = (key) => {
+    setColorOptions((prev) => prev.map((color) => ({ ...color, is_default: color.key === key })));
+  };
+
   const handleSubmit = async () => {
+    const normalizedColors = [];
+
+    for (let i = 0; i < colorOptions.length; i += 1) {
+      const color = colorOptions[i];
+      const uploadedUrl = color.file ? await uploadImageFile(color.file) : color.image_url;
+      const finalImage = (uploadedUrl || '').trim();
+      const finalName = (color.name || '').trim();
+
+      if (!finalImage || !finalName) {
+        continue;
+      }
+
+      normalizedColors.push({
+        name: finalName,
+        hex_code: (color.hex_code || '').trim(),
+        image_url: finalImage,
+        sort_order: i,
+        is_default: Boolean(color.is_default),
+      });
+    }
+
+    if (!normalizedColors.length) {
+      alert('Can it nhat 1 mau co ten va anh rieng.');
+      return;
+    }
+
+    if (!normalizedColors.some((c) => c.is_default)) {
+      normalizedColors[0].is_default = true;
+    }
+
+    const defaultColor = normalizedColors.find((c) => c.is_default) || normalizedColors[0];
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("slug", slug);
     formData.append("description", description);
     formData.append("price", price);
     formData.append("content", content);
-
-    if (imageFile) {
-      formData.append("file", imageFile);
-    }
+    formData.append("image_url", defaultColor.image_url);
+    formData.append("colors_json", JSON.stringify(normalizedColors));
 
 
     let url = `${API_URL}/products`;
@@ -182,6 +285,10 @@ export default function Admin() {
     });
 
     const data = await res.json();
+    if (!res.ok) {
+      alert(data?.detail || 'Khong luu duoc san pham');
+      return;
+    }
     alert(selectedId ? "Cập nhật thành công!" : "Tạo sản phẩm xong!");
     window.location.reload();
   };
@@ -334,11 +441,92 @@ export default function Admin() {
             />
           </div>
 
-          {/* Ảnh */}
-          <div className="mb-5">
-            <label className="block font-semibold mb-2">Ảnh đại diện</label>
-           {imageUrl && !imageFile && (<img src={getImageUrl(imageUrl)} className="w-40 mt-3 rounded" />)}
-            <input type ="file"  onChange={(e) => setImageFile(e.target.files[0])} className="w-full border border-gray-300 rounded-lg p-3"/>
+          {/* Màu sắc + ảnh theo màu */}
+          <div className="mb-6 rounded-lg border border-gray-200 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="block font-semibold">Bảng màu và ảnh theo màu</label>
+              <button
+                type="button"
+                onClick={handleAddColor}
+                className="rounded bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600"
+              >
+                + Thêm màu
+              </button>
+            </div>
+            <p className="mb-4 text-sm text-gray-600">Mỗi màu bắt buộc có tên và ảnh riêng. Màu mặc định sẽ là ảnh đại diện sản phẩm.</p>
+            <div className="space-y-4">
+              {colorOptions.map((color, index) => (
+                <div key={color.key} className="rounded border border-gray-200 p-3">
+                  <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+                    <input
+                      value={color.name}
+                      placeholder="Tên màu (VD: Trắng ngọc trai)"
+                      onChange={(e) => handleColorChange(color.key, 'name', e.target.value)}
+                      className="w-full rounded-lg border border-gray-300 p-3"
+                    />
+                    <input
+                      value={color.hex_code}
+                      placeholder="#ffffff"
+                      onChange={(e) => handleColorChange(color.key, 'hex_code', e.target.value)}
+                      className="w-full rounded-lg border border-gray-300 p-3"
+                    />
+                    <label className="flex items-center gap-2 rounded-lg border border-gray-300 p-3">
+                      <input
+                        type="radio"
+                        name="default-color"
+                        checked={color.is_default}
+                        onChange={() => handleSetDefaultColor(color.key)}
+                      />
+                      <span className="text-sm">Màu mặc định</span>
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-3 md:items-center">
+                    <input
+                      value={color.image_url}
+                      placeholder="URL ảnh màu hoặc để trống nếu upload file"
+                      onChange={(e) => handleColorChange(color.key, 'image_url', e.target.value)}
+                      className="w-full rounded-lg border border-gray-300 p-3 md:col-span-2"
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleColorChange(color.key, 'file', e.target.files?.[0] || null)}
+                      className="w-full rounded-lg border border-gray-300 p-3"
+                    />
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="h-6 w-6 rounded-full border"
+                        style={{ backgroundColor: color.hex_code || '#d9d9d9' }}
+                      />
+                      <span className="text-sm text-gray-600">Màu #{index + 1}</span>
+                    </div>
+                    {colorOptions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveColor(color.key)}
+                        className="rounded bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100"
+                      >
+                        Xóa màu
+                      </button>
+                    )}
+                  </div>
+
+                  {color.image_url && !color.file && (
+                    <img src={getImageUrl(color.image_url)} alt={color.name || `Mau ${index + 1}`} className="mt-3 h-24 rounded object-cover" />
+                  )}
+                  {color.file && (
+                    <p className="mt-2 text-sm text-blue-600">Đã chọn file: {color.file.name}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            {imageUrl && (
+              <p className="mt-3 text-xs text-gray-500">Ảnh đại diện hiện tại: {imageUrl}</p>
+            )}
           </div>
 
           {/* TinyMCE editor */}

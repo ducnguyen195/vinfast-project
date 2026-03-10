@@ -55,5 +55,18 @@ export async function ensureSchema() {
     );
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS product_colors (
+      id SERIAL PRIMARY KEY,
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      name VARCHAR(100) NOT NULL,
+      hex_code VARCHAR(20),
+      image_url VARCHAR(500),
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      is_default BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   schemaReady = true;
 }
