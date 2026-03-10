@@ -8,7 +8,12 @@ export default function Seo({
   type = 'website',
   locale = 'vi_VN',
   noindex = false,
+  jsonLd,
 }) {
+  const jsonLdItems = Array.isArray(jsonLd)
+    ? jsonLd.filter(Boolean)
+    : (jsonLd ? [jsonLd] : []);
+
   return (
     <Head>
       {title ? <title>{title}</title> : null}
@@ -26,6 +31,13 @@ export default function Seo({
       {image ? <meta name="twitter:image" content={image} /> : null}
       <meta name="twitter:card" content="summary_large_image" />
       {url ? <link rel="canonical" href={url} /> : null}
+      {jsonLdItems.map((item, index) => (
+        <script
+          key={`jsonld-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+        />
+      ))}
     </Head>
   );
 }

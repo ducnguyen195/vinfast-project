@@ -53,12 +53,30 @@ function DetailProduct({ initialProduct = null }) {
   const selectedColor = colors[selectedColorIndex] || colors[0] || null;
   const selectedImage = selectedColor?.image_url || product.image_url;
 
-  const pageUrl = typeof window !== 'undefined'
-    ? window.location.href
-    : absoluteUrl(`/products/${slug || ''}`);
+  const canonicalSlug = product?.slug || slug || '';
+  const pageUrl = absoluteUrl(`/products/${canonicalSlug}`);
   const pageTitle = product.name;
   const pageDescription = product.description || pageTitle;
   const pageImage = getImageUrl2(selectedImage);
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: pageTitle,
+    description: pageDescription,
+    image: pageImage ? [pageImage] : undefined,
+    sku: String(product.id || canonicalSlug || ''),
+    brand: {
+      '@type': 'Brand',
+      name: 'VinFast',
+    },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'VND',
+      price: Number(product.price || 0),
+      availability: 'https://schema.org/InStock',
+      url: pageUrl,
+    },
+  };
 
   return (
     <div className="mt-10 container mx-auto px-4 sm:px-6 px-4 lg:px-20">
@@ -67,6 +85,8 @@ function DetailProduct({ initialProduct = null }) {
         description={pageDescription}
         url={pageUrl}
         image={pageImage}
+        type="product"
+        jsonLd={productJsonLd}
       />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
         <div className="lg:col-span-9 bg-white p-4 rounded-lg">

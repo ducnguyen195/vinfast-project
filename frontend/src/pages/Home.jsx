@@ -5,12 +5,31 @@ import Seo from '../components/Seo';
 import { absoluteUrl } from '../utils/seo';
 
 function Home() {
+  const siteUrl = absoluteUrl('/');
+  const orgJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'VinFast Ha Thanh',
+    url: siteUrl,
+    telephone: '0986585054',
+    logo: absoluteUrl('/images/logo/favicon.png'),
+  };
+
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'VinFast Ha Thanh',
+    url: siteUrl,
+    inLanguage: 'vi-VN',
+  };
+
   return (
     <div>
       <Seo
         title="VinFast Hà Thành - Trang Chủ"
         description="Đại lý chính hãng VinFast tại Hà Thành. Tư vấn, báo giá và giao xe tận nơi. Hotline 0986 585 054."
-        url={absoluteUrl('/')}
+        url={siteUrl}
+        jsonLd={[orgJsonLd, websiteJsonLd]}
       />
       {/* Slider */}
       <Slider /> 
