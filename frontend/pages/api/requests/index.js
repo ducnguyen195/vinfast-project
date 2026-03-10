@@ -1,5 +1,43 @@
 import { ensureSchema, pool } from '../../../src/server/db';
 
+async function sendTelegramNotification(payload) {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!botToken || !chatId) {
+    return { ok: false, detail: 'Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID' };
+  }
+
+  const text = [
+    '🚗 YEU CAU THONG TIN MOI',
+    '',
+    `👤 Ho va ten: ${payload.name}`,
+    `📧 Email: ${payload.email}`,
+    `📱 Dien thoai: ${payload.phone}`,
+    `🚙 San pham: ${payload.product}`,
+    `💬 Loi nhan: ${payload.message || 'Khong co'}`,
+    '',
+    '⚡ Vui long lien he khach hang som nhat.',
+  ].join('\n');
+
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text }),
+    });
+
+    const data = await response.json();
+    if (!response.ok || !data?.ok) {
+      return { ok: false, detail: data?.description || 'Telegram API error' };
+    }
+
+    return { ok: true, detail: '' };
+  } catch (error) {
+    return { ok: false, detail: error.message };
+  }
+}
+
 export default async function handler(req, res) {
   try {
     await ensureSchema();
@@ -26,10 +64,30 @@ export default async function handler(req, res) {
         [name, email, phone, product, message || null]
       );
 
+      const requestRow = insert.rows[0];
+      const telegram = await sendTelegramNotification({ name, email, phone, product, message });
+
+      try {
+        await pool.query(
+          'UPDATE customer_requests SET telegram_sent = $1 WHERE id = $2',
+          [telegram.ok ? 'sent' : 'failed', requestRow.id]
+        );
+      } catch (updateError) {
+        // Keep form submission successful even if status update fails.
+        // eslint-disable-next-line no-console
+        console.error('Failed to update telegram_sent status:', updateError.message);
+      }
+
       return res.status(201).json({
         success: true,
-        message: 'Yêu cầu của bạn đã được gửi thành công',
-        data: insert.rows[0],
+        message: telegram.ok
+          ? 'Yêu cầu của bạn đã được gửi thành công'
+          : 'Yêu cầu đã lưu, nhưng gửi Telegram thất bại',
+        data: requestRow,
+        telegram: {
+          ok: telegram.ok,
+          detail: telegram.ok ? undefined : telegram.detail,
+        },
       });
     }
 

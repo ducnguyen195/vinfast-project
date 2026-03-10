@@ -42,6 +42,11 @@ export async function ensureSchema() {
     );
   `);
 
+  // Backward compatibility for old databases created before these columns existed.
+  await pool.query(`ALTER TABLE customer_requests ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'pending';`);
+  await pool.query(`ALTER TABLE customer_requests ADD COLUMN IF NOT EXISTS telegram_sent VARCHAR(50) DEFAULT 'pending';`);
+  await pool.query(`ALTER TABLE customer_requests ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;`);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS posts (
       id SERIAL PRIMARY KEY,
