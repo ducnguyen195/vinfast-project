@@ -2,14 +2,9 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/products": "pages/products.js",
-  "/contact": "pages/contact.js",
   "/": "pages/index.js",
-  "/posts": "pages/posts.js",
-  "/price-table": "pages/price-table.js",
-  "/api/posts": "pages/api/posts.js",
-  "/admin-login": "pages/admin-login.js",
-  "/sitemap.xml": "pages/sitemap.xml.js",
-  "/robots.txt": "pages/robots.txt.js",
-  "/api/products": "pages/api/products.js"
+  "/products": "pages/products.js",
+  "/admin": "pages/admin.js",
+  "/api/products": "pages/api/products.js",
+  "/api/posts": "pages/api/posts.js"
 }
