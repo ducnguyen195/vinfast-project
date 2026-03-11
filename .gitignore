@@ -20,3 +20,4 @@ htmlcov/
 backend/uploads/
 .next/
 frontend/.next/
+frontend/public/uploads/
