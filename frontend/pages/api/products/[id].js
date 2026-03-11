@@ -29,7 +29,7 @@ export default async function handler(req, res) {
             sort_order: Number.isFinite(Number(item?.sort_order)) ? Number(item.sort_order) : index,
             is_default: Boolean(item?.is_default),
           }))
-          .filter((item) => item.image_url && (item.name || item.hex_code))
+          .filter((item) => item.image_url)
           .map((item, index) => ({ ...item, sort_order: Number.isFinite(item.sort_order) ? item.sort_order : index }));
       } catch {
         return [];
@@ -110,7 +110,7 @@ export default async function handler(req, res) {
       const normalizedColors = colors.length
         ? colors
         : (imageUrl
-          ? [{ name: 'Mau mac dinh', hex_code: '', image_url: imageUrl, sort_order: 0, is_default: true }]
+          ? [{ name: '', hex_code: '', image_url: imageUrl, sort_order: 0, is_default: true }]
           : []);
 
       if (!normalizedColors.length) {
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
              VALUES ($1, $2, $3, $4, $5, $6)`,
             [
               Number(id),
-              color.name || `Mau ${i + 1}`,
+              color.name || '',
               color.hex_code || '',
               color.image_url || imageUrl || null,
               color.sort_order,
