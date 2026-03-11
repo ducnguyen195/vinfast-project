@@ -4,9 +4,13 @@ export default async function handler(req, res) {
   }
 
   const { username, password } = req.body || {};
-  const adminUser = process.env.ADMIN_USERNAME || 'admin';
-  const adminPass = process.env.ADMIN_PASSWORD || 'Admin@1234';
-  const adminToken = process.env.ADMIN_TOKEN || 'vinfast_admin_quynhhoa_140894@#';
+  const adminUser = process.env.ADMIN_USERNAME;
+  const adminPass = process.env.ADMIN_PASSWORD;
+  const adminToken = process.env.ADMIN_TOKEN;
+
+  if (!adminUser || !adminPass || !adminToken) {
+    return res.status(500).json({ success: false, detail: 'Missing admin environment configuration' });
+  }
 
   if (username === adminUser && password === adminPass) {
     return res.status(200).json({ success: true, token: adminToken });

@@ -24,6 +24,9 @@ export function ensureUploadDir(subFolder) {
 
 export function isAuthorized(req) {
   const token = req.headers['admin-token'];
-  const expected = process.env.ADMIN_TOKEN || 'vinfast_admin_quynhhoa_140894@#';
+  const expected = process.env.ADMIN_TOKEN;
+  if (!expected) {
+    return false;
+  }
   return token === expected;
 }
