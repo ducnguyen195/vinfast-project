@@ -13,6 +13,6 @@ Useful files:
 - `START_HERE.md`: fast start
 - `docker-compose.yml`: run stack
 - `Dockerfile`: app image build
-- `.env.example`: environment variables
+- `frontend/.env`: environment variables
 - `run.sh`: local run helper
 - `install.sh`: dependency install helper
