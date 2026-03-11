@@ -16,7 +16,40 @@ function DetailProduct({ initialProduct = null }) {
 
   const normalizeColors = (input) => {
     if (!Array.isArray(input)) return [];
-    return input.filter((item) => item?.image_url && (item?.name || item?.hex_code));
+    return input.filter((item) => item?.image_url);
+  };
+
+  const normalizeContentHtml = (html = '') => {
+    if (!html || typeof html !== 'string') return '';
+
+    return html.replace(/\b(src|poster)=["']([^"']+)["']/gi, (full, attr, rawUrl) => {
+      const value = String(rawUrl || '').trim();
+      if (!value) return full;
+
+      if (value.startsWith('data:') || value.startsWith('blob:')) {
+        return full;
+      }
+
+      // Rewrite legacy absolute media URLs (e.g. localhost/uploads/...) to current base URL.
+      const absoluteUploadMatch = value.match(/^https?:\/\/[^/]+\/(uploads\/.*)$/i);
+      if (absoluteUploadMatch?.[1]) {
+        const fixed = getImageUrl(absoluteUploadMatch[1]);
+        return `${attr}="${fixed}"`;
+      }
+
+      // Keep other absolute/external URLs unchanged.
+      if (/^(https?:)?\/\//i.test(value)) {
+        return full;
+      }
+
+      const cleanPath = value.replace(/^\/+/, '');
+      if (cleanPath.startsWith('uploads/')) {
+        const fixed = getImageUrl(cleanPath);
+        return `${attr}="${fixed}"`;
+      }
+
+      return `${attr}="/${cleanPath}"`;
+    });
   };
 
   useEffect(() => {
@@ -48,10 +81,12 @@ function DetailProduct({ initialProduct = null }) {
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (!product) return <div className="text-center py-10">Product not found</div>;
 
-  const getImageUrl2 = getImageUrl;  // Reuse from config
+  const getImageUrl2 = getImageUrl;  // Rechỗuse from config
   const colors = normalizeColors(product?.colors || []);
   const selectedColor = colors[selectedColorIndex] || colors[0] || null;
   const selectedImage = selectedColor?.image_url || product.image_url;
+  const selectedImageUrl = selectedImage ? getImageUrl2(selectedImage) : '';
+  const contentHtml = normalizeContentHtml(product?.content || '');
 
   const canonicalSlug = product?.slug || slug || '';
   const pageUrl = absoluteUrl(`/products/${canonicalSlug}`);
@@ -79,7 +114,7 @@ function DetailProduct({ initialProduct = null }) {
   };
 
   return (
-    <div className="mt-10 container mx-auto px-4 sm:px-6 px-4 lg:px-20">
+    <div className="mt-10 container mx-auto px-4 sm:px-6 lg:px-20">
       <Seo
         title={pageTitle}
         description={pageDescription}
@@ -88,40 +123,48 @@ function DetailProduct({ initialProduct = null }) {
         type="product"
         jsonLd={productJsonLd}
       />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-9 bg-white p-4 rounded-lg">
-          <div className="flex flex-col md:flex-row items-start gap-4">
-            <img
-              src={getImageUrl2(selectedImage)} alt={product.name} className="w-full md:w-1/2 h-auto rounded-lg mb-4 md:mb-0"
-            />
-            <div className="md:ml-6">
-              <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
-              <p className="text-gray-700 mb-4">{product.description}</p>
-              {!!colors.length && (
-                <div className="mb-4">
-                  <p className="mb-2 text-sm font-semibold text-gray-700">
-                    Màu đang chọn: {selectedColor?.name || 'Mặc định'}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div className="w-full">
+              <div className="w-full max-w-[510px] h-[230px] mx-auto aspect-[4/3] rounded-lg bg-gray-50 overflow-hidden flex items-center justify-center">
+                {selectedImageUrl ? (
+                  <img
+                    src={selectedImageUrl}
+                    alt={product.name}
+                    className="h-full w-full object-cover object-center"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-gray-100 flex items-center justify-center text-gray-500">
+                    Chua co anh san pham
+                  </div>
+                )}
+              </div>
+               {!!colors.length && (
+                <div className="mb-4 mt-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {colors.map((color, index) => {
                       const isActive = index === selectedColorIndex;
                       const tone = color.hex_code || '#d9d9d9';
                       return (
                         <button
-                          key={`${color.id || color.name}_${index}`}
+                          key={`${color.id || index}_${index}`}
                           type="button"
-                          title={color.name || `Màu ${index + 1}`}
+                          aria-label={`Chon mau ${index + 1}`}
                           onClick={() => setSelectedColorIndex(index)}
-                          className={`flex items-center gap-2 rounded-full border px-2 py-1 ${isActive ? 'border-blue-600' : 'border-gray-300 hover:border-gray-400'}`}
+                          className={`h-11 w-11 rounded-full border flex items-center justify-center ${isActive ? 'border-blue-600' : 'border-gray-300 hover:border-gray-400'}`}
                         >
-                          <span className="h-7 w-7 rounded-full border" style={{ backgroundColor: tone }} />
-                          <span className="text-sm text-gray-700">{color.name || `Màu ${index + 1}`}</span>
+                          <span className="block h-8 w-8 rounded-full border" style={{ backgroundColor: tone }} />
                         </button>
                       );
                     })}
                   </div>
                 </div>
               )}
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
+              <p className="text-gray-700 mb-4">{product.description}</p>
               <p className="text-xl font-semibold text-green-600 mb-4">
                 {new Intl.NumberFormat("vi-VN", {
                   style: "currency",
@@ -133,7 +176,7 @@ function DetailProduct({ initialProduct = null }) {
               </Link>
             </div>
           </div>
-          <div className="mt-8 text-gray-700 leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: product.content }}/>
+          <div className="mt-8 text-gray-700 leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: contentHtml }}/>
         </div>
 
         <div className="lg:col-span-3">

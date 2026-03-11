@@ -21,4 +21,4 @@ npm install
 npm run dev
 ```
 
-Set env values from `.env.example` when needed.
+Set env values in `frontend/.env` when needed.

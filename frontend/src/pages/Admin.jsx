@@ -179,7 +179,7 @@ export default function Admin() {
       setColorOptions(
         colors.map((color, index) => ({
           key: `${color.id || 'db'}_${index}_${Date.now()}`,
-          name: color.name || `Mau ${index + 1}`,
+          name: color.name || '',
           hex_code: color.hex_code || '#d9d9d9',
           image_url: color.image_url || '',
           file: null,
@@ -190,7 +190,7 @@ export default function Admin() {
       setColorOptions([
         {
           ...createColorDraft(0),
-          name: 'Mau mac dinh',
+          name: '',
           image_url: result.data.image_url || '',
           is_default: true,
         },
@@ -232,14 +232,12 @@ export default function Admin() {
       const color = colorOptions[i];
       const uploadedUrl = color.file ? await uploadImageFile(color.file) : color.image_url;
       const finalImage = (uploadedUrl || '').trim();
-      const finalName = (color.name || '').trim();
-
-      if (!finalImage || !finalName) {
+      if (!finalImage) {
         continue;
       }
 
       normalizedColors.push({
-        name: finalName,
+        name: '',
         hex_code: (color.hex_code || '').trim(),
         image_url: finalImage,
         sort_order: i,
@@ -248,7 +246,7 @@ export default function Admin() {
     }
 
     if (!normalizedColors.length) {
-      alert('Can it nhat 1 mau co ten va anh rieng.');
+      alert('Can it nhat 1 mau co anh rieng.');
       return;
     }
 
@@ -453,17 +451,11 @@ export default function Admin() {
                 + Thêm màu
               </button>
             </div>
-            <p className="mb-4 text-sm text-gray-600">Mỗi màu bắt buộc có tên và ảnh riêng. Màu mặc định sẽ là ảnh đại diện sản phẩm.</p>
+            <p className="mb-4 text-sm text-gray-600">Mỗi màu cần ảnh riêng. Màu được tích chọn sẽ là ảnh đại diện cho sản phẩm.</p>
             <div className="space-y-4">
               {colorOptions.map((color, index) => (
                 <div key={color.key} className="rounded border border-gray-200 p-3">
-                  <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-3">
-                    <input
-                      value={color.name}
-                      placeholder="Tên màu (VD: Trắng ngọc trai)"
-                      onChange={(e) => handleColorChange(color.key, 'name', e.target.value)}
-                      className="w-full rounded-lg border border-gray-300 p-3"
-                    />
+                  <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-2">
                     <input
                       value={color.hex_code}
                       placeholder="#ffffff"
@@ -477,7 +469,6 @@ export default function Admin() {
                         checked={color.is_default}
                         onChange={() => handleSetDefaultColor(color.key)}
                       />
-                      <span className="text-sm">Màu mặc định</span>
                     </label>
                   </div>
 
@@ -502,7 +493,6 @@ export default function Admin() {
                         className="h-6 w-6 rounded-full border"
                         style={{ backgroundColor: color.hex_code || '#d9d9d9' }}
                       />
-                      <span className="text-sm text-gray-600">Màu #{index + 1}</span>
                     </div>
                     {colorOptions.length > 1 && (
                       <button
@@ -516,7 +506,7 @@ export default function Admin() {
                   </div>
 
                   {color.image_url && !color.file && (
-                    <img src={getImageUrl(color.image_url)} alt={color.name || `Mau ${index + 1}`} className="mt-3 h-24 rounded object-cover" />
+                    <img src={getImageUrl(color.image_url)} alt="Anh mau" className="mt-3 h-24 rounded object-cover" />
                   )}
                   {color.file && (
                     <p className="mt-2 text-sm text-blue-600">Đã chọn file: {color.file.name}</p>

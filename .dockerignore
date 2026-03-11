@@ -3,4 +3,7 @@
 **/.git
 **/.DS_Store
 **/venv
+**/.env
+**/.env.*
+frontend/public/uploads
 backend/
