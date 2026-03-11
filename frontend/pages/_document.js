@@ -6,6 +6,8 @@ export default function Document() {
       <Head>
         <meta charSet="utf-8" />
         <meta name="theme-color" content="#003366" />
+        <link rel="icon" type="image/png" href="/images/logo/favicon.png" />
+        <link rel="apple-touch-icon" href="/images/logo/favicon.png" />
       </Head>
       <body>
         <Main />
