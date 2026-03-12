@@ -8,12 +8,13 @@ import { absoluteUrl } from '../utils/seo';
 function ContactForm() {
   const router = useRouter();
   const queryProduct = typeof router.query.product === 'string' ? router.query.product : '';
+  const [products, setProducts] = useState([]);
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    product: queryProduct || 'VinFast VF 8',
+    product: queryProduct || '',
     message: ''
   });
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,29 @@ function ContactForm() {
   useEffect(() => {
     if (!queryProduct) return;
     setFormData((prev) => ({ ...prev, product: queryProduct }));
+  }, [queryProduct]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/products`);
+        const fetchedProducts = response.data?.data || [];
+        setProducts(fetchedProducts);
+
+        // If there is no product from query, default to the first product from API.
+        if (!queryProduct && fetchedProducts.length > 0) {
+          setFormData((prev) => ({
+            ...prev,
+            product: prev.product || fetchedProducts[0].name
+          }));
+        }
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setProducts([]);
+      }
+    };
+
+    fetchProducts();
   }, [queryProduct]);
 
   const handleChange = (e) => {
@@ -47,7 +71,7 @@ function ContactForm() {
           name: '',
           email: '',
           phone: '',
-          product: '',
+          product: queryProduct || products[0]?.name || '',
           message: ''
         });
 
@@ -135,14 +159,18 @@ function ContactForm() {
               name="product"
               value={formData.product}
               onChange={handleChange}
+              required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vinfast"
             >
-              <option value="VinFast VF 8">VinFast VF 8 - SUV thông minh</option>
-              <option value="VinFast VF 9">VinFast VF 9 - SUV hạng sang</option>
-              <option value="VinFast VF 7">VinFast VF 7 - SUV compact</option>
-              <option value="VinFast VF 6">VinFast VF 6 - Crossover điện</option>
-              <option value="VinFast VF 3">VinFast VF 3 - Sedan compact</option>
-              <option value="Other">Khác</option>
+              {products.length === 0 && <option value="">Chọn sản phẩm</option>}
+              {products.map((product) => (
+                <option key={product.id} value={product.name}>
+                  {product.name}
+                </option>
+              ))}
+              {queryProduct && !products.some((product) => product.name === queryProduct) && (
+                <option value={queryProduct}>{queryProduct}</option>
+              )}
             </select>
           </div>
 
