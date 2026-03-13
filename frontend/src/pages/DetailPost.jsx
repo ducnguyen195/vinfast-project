@@ -19,6 +19,35 @@ export default function DetailPost({ initialPost = null }) {
 
   if (!post) return <div className="max-w-4xl mx-auto mt-8">Đang tải...</div>;
 
+  const normalizeContentHtml = (html = '') => {
+    if (!html || typeof html !== 'string') return '';
+
+    return html.replace(/\b(src|poster)=["']([^"']+)["']/gi, (full, attr, rawUrl) => {
+      const value = String(rawUrl || '').trim();
+      if (!value) return full;
+
+      if (value.startsWith('data:') || value.startsWith('blob:')) {
+        return full;
+      }
+
+      const absoluteUploadMatch = value.match(/^https?:\/\/[^/]+\/(uploads\/.*)$/i);
+      if (absoluteUploadMatch?.[1]) {
+        return `${attr}="${getImageUrl(absoluteUploadMatch[1])}"`;
+      }
+
+      if (/^(https?:)?\/\//i.test(value)) {
+        return `${attr}="${encodeURI(value)}"`;
+      }
+
+      const cleanPath = value.replace(/^\/+/, '');
+      if (cleanPath.startsWith('uploads/')) {
+        return `${attr}="${getImageUrl(cleanPath)}"`;
+      }
+
+      return `${attr}="${encodeURI(`/${cleanPath}`)}"`;
+    });
+  };
+
   const canonicalSlug = post?.slug || slug || '';
   const pageUrl = absoluteUrl(`/posts/${canonicalSlug}`);
   const pageTitle = post.title;
@@ -48,6 +77,7 @@ export default function DetailPost({ initialPost = null }) {
   };
 
   const getImageUrl2 = getImageUrl; // Reuse from config
+  const contentHtml = normalizeContentHtml(post.content || '');
 
   return (
     <div className="max-w-6xl mx-auto mt-8 bg-white p-6 rounded shadow">
@@ -61,7 +91,7 @@ export default function DetailPost({ initialPost = null }) {
       />
       <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
       {post.image_url && <img src={getImageUrl2(post.image_url)} alt={post.title} className="w-full h-auto object-cover rounded mb-4" />}
-      <div className="prose" dangerouslySetInnerHTML={{ __html: post.content }} />
+      <div className="prose" dangerouslySetInnerHTML={{ __html: contentHtml }} />
     </div>
   );
 }

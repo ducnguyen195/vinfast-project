@@ -28,7 +28,7 @@ function App() {
             <Route path="/posts" element={<Posts />} />
             <Route path="/posts/:slug" element={<DetailPost />} />
             <Route path="/contact" element={<ContactForm />} />
-            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="/admin-login" element={<AdminLogin />} />g
             <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>

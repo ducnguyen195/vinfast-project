@@ -37,9 +37,9 @@ function DetailProduct({ initialProduct = null }) {
         return `${attr}="${fixed}"`;
       }
 
-      // Keep other absolute/external URLs unchanged.
+      // Keep other absolute/external URLs, but encode unsafe characters.
       if (/^(https?:)?\/\//i.test(value)) {
-        return full;
+        return `${attr}="${encodeURI(value)}"`;
       }
 
       const cleanPath = value.replace(/^\/+/, '');
