@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route,Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -29,7 +29,7 @@ function App() {
             <Route path="/posts/:slug" element={<DetailPost />} />
             <Route path="/contact" element={<ContactForm />} />
             <Route path="/admin-login" element={<AdminLogin />} />
-            <Route path="/admin"element={localStorage.getItem("admin_token") ? <Admin /> : <Navigate to="/admin-login" />}/>
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
         <Footer />
