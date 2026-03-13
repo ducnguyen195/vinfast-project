@@ -1,7 +1,7 @@
 import { copyFileSync } from 'fs';
 import { basename, join } from 'path';
 import { parseMultipart } from '../../src/server/form';
-import { ensureUploadDir } from '../../src/server/utils';
+import { ensureUploadDir, isAuthorized } from '../../src/server/utils';
 
 export const config = {
   api: {
@@ -12,6 +12,10 @@ export const config = {
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
+  }
+
+  if (!isAuthorized(req)) {
+    return res.status(403).json({ success: false, detail: 'Không có quyền' });
   }
 
   try {

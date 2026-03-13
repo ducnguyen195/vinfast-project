@@ -15,6 +15,7 @@ export default function AdminLogin() {
     try {
       const res = await fetch(`${API_URL}/admin/login`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json"
         },
@@ -23,7 +24,6 @@ export default function AdminLogin() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-          localStorage.setItem("admin_token", data.token);
           router.push('/admin');
       } else {
         setError("Sai tai khoan hoac mat khau");

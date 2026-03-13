@@ -12,6 +12,7 @@ const handleImageUpload = (blobInfo) => {
 
   return fetch(`${API_URL}/upload`, {
     method: 'POST',
+    credentials: 'include',
     body: data,
   })
     .then(res => {
@@ -41,6 +42,7 @@ const uploadImageFile = async (file) => {
 
   const res = await fetch(`${API_URL}/upload`, {
     method: 'POST',
+    credentials: 'include',
     body: data,
   });
 
@@ -118,29 +120,39 @@ export default function Admin() {
 
   // load list sản phẩm
   useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('admin_token')) {
-      router.replace('/admin-login');
-      return;
-    }
+    const bootstrap = async () => {
+      try {
+        const authRes = await fetch(`${API_URL}/admin/session`, { credentials: 'include' });
+        if (!authRes.ok) {
+          router.replace('/admin-login');
+          return;
+        }
 
-    setIsCheckingAuth(false);
-    setLoadError("");
+        setLoadError("");
 
-    fetch(`${API_URL}/products`)
-      .then(res => res.json())
-      .then(data => setProducts(Array.isArray(data.data) ? data.data : []))
-      .catch(() => {
-        setProducts([]);
-        setLoadError("Khong tai duoc du lieu san pham. Kiem tra DATABASE_URL/PostgreSQL.");
-      });
-    // load posts for admin
-    fetch(`${API_URL}/posts`)
-      .then(res => res.json())
-      .then(data => setPosts(Array.isArray(data.data) ? data.data : []))
-      .catch(() => {
-        setPosts([]);
-        setLoadError("Khong tai duoc du lieu bai viet. Kiem tra DATABASE_URL/PostgreSQL.");
-      });
+        fetch(`${API_URL}/products`)
+          .then(res => res.json())
+          .then(data => setProducts(Array.isArray(data.data) ? data.data : []))
+          .catch(() => {
+            setProducts([]);
+            setLoadError("Khong tai duoc du lieu san pham. Kiem tra DATABASE_URL/PostgreSQL.");
+          });
+
+        fetch(`${API_URL}/posts`)
+          .then(res => res.json())
+          .then(data => setPosts(Array.isArray(data.data) ? data.data : []))
+          .catch(() => {
+            setPosts([]);
+            setLoadError("Khong tai duoc du lieu bai viet. Kiem tra DATABASE_URL/PostgreSQL.");
+          });
+      } catch {
+        router.replace('/admin-login');
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    bootstrap();
   }, [router]);
 
   if (isCheckingAuth) {
@@ -276,9 +288,7 @@ export default function Admin() {
 
     const res = await fetch(url, {
       method,
-      headers: {
-        "admin-token": localStorage.getItem("admin_token"),
-      },
+      credentials: 'include',
       body: formData,
     });
 
@@ -336,9 +346,7 @@ export default function Admin() {
 
     const res = await fetch(url, {
       method,
-      headers: {
-        "admin-token": localStorage.getItem("admin_token"),
-      },
+      credentials: 'include',
       body: formData,
     });
 
@@ -361,8 +369,11 @@ export default function Admin() {
         </div>
 
         <button
-          onClick={() => {
-            localStorage.removeItem("admin_token");
+          onClick={async () => {
+            await fetch(`${API_URL}/admin/logout`, {
+              method: 'POST',
+              credentials: 'include',
+            });
             router.push('/admin-login');
           }}
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"

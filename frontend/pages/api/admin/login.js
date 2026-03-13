@@ -13,7 +13,21 @@ export default async function handler(req, res) {
   }
 
   if (username === adminUser && password === adminPass) {
-    return res.status(200).json({ success: true, token: adminToken });
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieParts = [
+      `admin_token=${encodeURIComponent(adminToken)}`,
+      'Path=/',
+      'HttpOnly',
+      'SameSite=Lax',
+      `Max-Age=${60 * 60 * 8}`,
+    ];
+
+    if (isProduction) {
+      cookieParts.push('Secure');
+    }
+
+    res.setHeader('Set-Cookie', cookieParts.join('; '));
+    return res.status(200).json({ success: true });
   }
 
   return res.status(401).json({ success: false, detail: 'Sai tài khoản' });
