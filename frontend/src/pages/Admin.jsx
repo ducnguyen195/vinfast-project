@@ -5,10 +5,12 @@ import API_URL, { getImageUrl } from "../api/config";
 import Seo from '../components/Seo';
 import { absoluteUrl } from '../utils/seo';
 
-// helper for TinyMCE image uploads
-const handleImageUpload = (blobInfo) => {
+const uploadMediaFile = (file, metadata = {}) => {
   const data = new FormData();
-  data.append('file', blobInfo.blob(), blobInfo.filename());
+  data.append('file', file, file.name || `media-${Date.now()}`);
+  if (metadata.purpose) data.append('purpose', metadata.purpose);
+  if (metadata.entityType) data.append('entity_type', metadata.entityType);
+  if (metadata.entityKey) data.append('entity_key', metadata.entityKey);
 
   return fetch(`${API_URL}/upload`, {
     method: 'POST',
@@ -36,22 +38,12 @@ const createColorDraft = (index = 0) => ({
   is_default: index === 0,
 });
 
-const uploadImageFile = async (file) => {
-  const data = new FormData();
-  data.append('file', file, file.name || `color-${Date.now()}.png`);
-
-  const res = await fetch(`${API_URL}/upload`, {
-    method: 'POST',
-    credentials: 'include',
-    body: data,
-  });
-
-  const json = await res.json();
-  if (!res.ok || !json?.location) {
-    throw new Error(json?.detail || 'Upload ảnh màu thất bại');
+const uploadImageFile = async (file, metadata = {}) => {
+  try {
+    return await uploadMediaFile(file, metadata);
+  } catch (error) {
+    throw new Error(error?.message || 'Upload ảnh màu thất bại');
   }
-
-  return json.location;
 };
 
 export default function Admin() {
@@ -117,6 +109,17 @@ export default function Admin() {
 
   const [products, setProducts] = useState([]);
   const [selectedId, setSelectedId] = useState("");
+
+  const activeEntityType = activeTab === 'posts' ? 'post' : 'product';
+  const activeEntityKey = activeTab === 'posts'
+    ? (postSlug || selectedPostId || postTitle || 'post-draft')
+    : (slug || selectedId || name || 'product-draft');
+
+  const handleEditorImageUpload = (blobInfo) => uploadMediaFile(blobInfo.blob(), {
+    purpose: 'tinymce',
+    entityType: activeEntityType,
+    entityKey: activeEntityKey,
+  });
 
   // load list sản phẩm
   useEffect(() => {
@@ -242,7 +245,11 @@ export default function Admin() {
 
     for (let i = 0; i < colorOptions.length; i += 1) {
       const color = colorOptions[i];
-      const uploadedUrl = color.file ? await uploadImageFile(color.file) : color.image_url;
+      const uploadedUrl = color.file ? await uploadImageFile(color.file, {
+        purpose: 'product-color',
+        entityType: 'product',
+        entityKey: slug || selectedId || name || `color-${i + 1}`,
+      }) : color.image_url;
       const finalImage = (uploadedUrl || '').trim();
       if (!finalImage) {
         continue;
@@ -547,7 +554,7 @@ export default function Admin() {
                     ],
                     toolbar:
                       'undo redo |fontsize formatselect forecolor | bold italic backcolor | alignleft aligncenter table alignright alignjustify | bullist numlist outdent indent | removeformat | image media link',
-                    images_upload_handler: handleImageUpload,
+                    images_upload_handler: handleEditorImageUpload,
                     automatic_uploads: true,
                     media_live_embeds: true,
                     media_filter_html: false,
@@ -620,7 +627,7 @@ export default function Admin() {
                     ],
                     toolbar:
                       'undo redo |fontsize formatselect forecolor | bold italic backcolor | alignleft aligncenter table alignright alignjustify | bullist numlist outdent indent | removeformat | image media link',
-                  images_upload_handler: handleImageUpload,
+                  images_upload_handler: handleEditorImageUpload,
                   automatic_uploads: true,
                   media_live_embeds: true,
                   media_filter_html: false,

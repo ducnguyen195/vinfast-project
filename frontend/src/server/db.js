@@ -48,6 +48,23 @@ export async function ensureSchema() {
   await pool.query(`ALTER TABLE customer_requests ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;`);
 
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS media_uploads (
+      id BIGSERIAL PRIMARY KEY,
+      file_name VARCHAR(255) NOT NULL,
+      mime_type VARCHAR(255) NOT NULL DEFAULT 'application/octet-stream',
+      purpose VARCHAR(50),
+      entity_type VARCHAR(50),
+      entity_key VARCHAR(255),
+      content BYTEA NOT NULL,
+      byte_size INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  await pool.query(`ALTER TABLE media_uploads ADD COLUMN IF NOT EXISTS purpose VARCHAR(50);`);
+  await pool.query(`ALTER TABLE media_uploads ADD COLUMN IF NOT EXISTS entity_type VARCHAR(50);`);
+  await pool.query(`ALTER TABLE media_uploads ADD COLUMN IF NOT EXISTS entity_key VARCHAR(255);`);
+
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS posts (
       id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,

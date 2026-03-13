@@ -1,8 +1,7 @@
-import { copyFileSync } from 'fs';
-import { basename, join } from 'path';
 import { ensureSchema, pool } from '../../../../src/server/db';
 import { parseMultipart } from '../../../../src/server/form';
-import { ensureUploadDir, isAuthorized } from '../../../../src/server/utils';
+import { storeUploadedFile } from '../../../../src/server/media';
+import { isAuthorized } from '../../../../src/server/utils';
 
 export const config = {
   api: {
@@ -30,11 +29,12 @@ export default async function handler(req, res) {
 
     const file = files.file?.[0];
     if (file?.filepath) {
-      const uploadDir = ensureUploadDir('posts');
-      const savedName = `${slug || 'post'}_${Date.now()}_${basename(file.originalFilename || 'image')}`;
-      const target = join(uploadDir, savedName);
-      copyFileSync(file.filepath, target);
-      imageUrl = `uploads/posts/${savedName}`;
+      imageUrl = await storeUploadedFile(file, {
+        fallbackName: `${slug || 'post'}-image`,
+        purpose: 'post-cover',
+        entityType: 'post',
+        entityKey: slug || title,
+      });
     }
 
     const inserted = await pool.query(
