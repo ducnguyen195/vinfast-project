@@ -547,13 +547,15 @@ export default function Admin() {
                   init={{
                     height: 400,
                     menubar: false,
+                    font_family_formats: 'Arial=arial,helvetica,sans-serif; Times New Roman=times new roman,times,serif; Georgia=georgia,palatino,serif; Tahoma=tahoma,arial,helvetica,sans-serif; Verdana=verdana,geneva,sans-serif; Trebuchet MS=trebuchet ms,helvetica,sans-serif; Courier New=courier new,courier,monospace; Garamond=garamond,serif; Palatino=palatino,book antiqua,palatino linotype,serif; Bookman=bookman,serif; Impact=impact,charcoal,sans-serif; Comic Sans MS=comic sans ms,sans-serif',
+                    font_size_formats: '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 42px 48px 56px 64px 72px 96px',
                     plugins: [
                       'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
                       'preview', 'anchor', 'searchreplace', 'visualblocks',
                       'code', 'fullscreen', 'insertdatetime', 'media', 'table'
                     ],
                     toolbar:
-                      'undo redo |fontsize formatselect forecolor | bold italic backcolor | alignleft aligncenter table alignright alignjustify | bullist numlist outdent indent | removeformat | image media link',
+                      'undo redo | fontfamily fontsize formatselect forecolor | bold italic backcolor | alignleft aligncenter table alignright alignjustify | bullist numlist outdent indent | removeformat | image media link',
                     images_upload_handler: handleEditorImageUpload,
                     automatic_uploads: true,
                     media_live_embeds: true,
@@ -620,13 +622,15 @@ export default function Admin() {
                 init={{
                   height: 400,
                   menubar: false,
+                  font_family_formats: 'Arial=arial,helvetica,sans-serif; Times New Roman=times new roman,times,serif; Georgia=georgia,palatino,serif; Tahoma=tahoma,arial,helvetica,sans-serif; Verdana=verdana,geneva,sans-serif; Trebuchet MS=trebuchet ms,helvetica,sans-serif; Courier New=courier new,courier,monospace; Garamond=garamond,serif; Palatino=palatino,book antiqua,palatino linotype,serif; Bookman=bookman,serif; Impact=impact,charcoal,sans-serif; Comic Sans MS=comic sans ms,sans-serif',
+                  font_size_formats: '8px 10px 12px 14px 16px 18px 20px 24px 28px 32px 36px 42px 48px 56px 64px 72px 96px',
                   plugins: [
                       'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
                       'preview', 'anchor', 'searchreplace', 'visualblocks',
                       'code', 'fullscreen', 'insertdatetime', 'media', 'table'
                     ],
                     toolbar:
-                      'undo redo |fontsize formatselect forecolor | bold italic backcolor | alignleft aligncenter table alignright alignjustify | bullist numlist outdent indent | removeformat | image media link',
+                      'undo redo | fontfamily fontsize formatselect forecolor | bold italic backcolor | alignleft aligncenter table alignright alignjustify | bullist numlist outdent indent | removeformat | image media link',
                   images_upload_handler: handleEditorImageUpload,
                   automatic_uploads: true,
                   media_live_embeds: true,
