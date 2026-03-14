@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, JSON
 from datetime import datetime
 from database import Base
 
@@ -12,6 +12,8 @@ class Product(Base):
     price = Column(Float)
     image_url = Column(String(500))
     content = Column(Text)
+    promotion_items = Column(JSON, default=list)
+    version_price_rows = Column(JSON, default=list)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 

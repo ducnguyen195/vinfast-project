@@ -13,6 +13,47 @@ export default async function handler(req, res) {
   try {
     await ensureSchema();
 
+    const normalizePromotionItems = (raw) => {
+      if (!raw) return [];
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+          .map((item, index) => {
+            if (typeof item === 'string') {
+              return { content: item.trim(), sort_order: index };
+            }
+
+            return {
+              content: String(item?.content || '').trim(),
+              sort_order: Number.isFinite(Number(item?.sort_order)) ? Number(item.sort_order) : index,
+            };
+          })
+          .filter((item) => item.content)
+          .map((item, index) => ({ ...item, sort_order: Number.isFinite(item.sort_order) ? item.sort_order : index }));
+      } catch {
+        return [];
+      }
+    };
+
+    const normalizeVersionPriceRows = (raw) => {
+      if (!raw) return [];
+      try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+          .map((item, index) => ({
+            version_name: String(item?.version_name || item?.name || '').trim(),
+            price_label: String(item?.price_label || item?.price || '').trim(),
+            sort_order: Number.isFinite(Number(item?.sort_order)) ? Number(item.sort_order) : index,
+          }))
+          .filter((item) => item.version_name || item.price_label)
+          .map((item, index) => ({ ...item, sort_order: Number.isFinite(item.sort_order) ? item.sort_order : index }));
+      } catch {
+        return [];
+      }
+    };
+
     const parseColorsPayload = (raw) => {
       if (!raw) return [];
       try {
@@ -74,6 +115,8 @@ export default async function handler(req, res) {
       const content = fields.content?.[0] || '';
       const inputImageUrl = fields.image_url?.[0] || '';
       const colorsJson = fields.colors_json?.[0] || '[]';
+      const promotionItemsJson = fields.promotion_items_json?.[0] || '[]';
+      const versionPriceRowsJson = fields.version_price_rows_json?.[0] || '[]';
       const inputSlug = fields.slug?.[0] || '';
       const finalSlug = inputSlug || slugify(name);
 
@@ -97,11 +140,23 @@ export default async function handler(req, res) {
         });
       }
 
+      const promotionItems = normalizePromotionItems(promotionItemsJson);
+      const versionPriceRows = normalizeVersionPriceRows(versionPriceRowsJson);
+
       const inserted = await pool.query(
-        `INSERT INTO products (name, slug, description, price, image_url, content)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO products (name, slug, description, price, image_url, content, promotion_items, version_price_rows)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::jsonb)
          RETURNING *`,
-        [name, finalSlug, description, price, imageUrl, content]
+        [
+          name,
+          finalSlug,
+          description,
+          price,
+          imageUrl,
+          content,
+          JSON.stringify(promotionItems),
+          JSON.stringify(versionPriceRows),
+        ]
       );
 
       const createdProduct = inserted.rows[0];

@@ -38,6 +38,17 @@ const createColorDraft = (index = 0) => ({
   is_default: index === 0,
 });
 
+const createPromotionRow = (index = 0) => ({
+  key: `promo_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 8)}`,
+  content: '',
+});
+
+const createVersionPriceRow = (index = 0) => ({
+  key: `price_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 8)}`,
+  version_name: '',
+  price_label: '',
+});
+
 const uploadImageFile = async (file, metadata = {}) => {
   try {
     return await uploadMediaFile(file, metadata);
@@ -58,6 +69,8 @@ export default function Admin() {
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [colorOptions, setColorOptions] = useState([createColorDraft(0)]);
+  const [promotionRows, setPromotionRows] = useState([]);
+  const [versionPriceRows, setVersionPriceRows] = useState([]);
   const [content, setContent] = useState("");
 
   // Posts 
@@ -177,6 +190,8 @@ export default function Admin() {
       setPrice("");
       setImageUrl(""); 
       setColorOptions([createColorDraft(0)]);
+      setPromotionRows([]);
+      setVersionPriceRows([]);
       setContent("");
       return;
     }
@@ -211,6 +226,23 @@ export default function Admin() {
         },
       ]);
     }
+    const promotionItems = Array.isArray(result?.data?.promotion_items) ? result.data.promotion_items : [];
+    setPromotionRows(
+      promotionItems.map((item, index) => ({
+        key: `promo_db_${index}_${Date.now()}`,
+        content: typeof item === 'string' ? item : (item?.content || ''),
+      }))
+    );
+
+    const versionPrices = Array.isArray(result?.data?.version_price_rows) ? result.data.version_price_rows : [];
+    setVersionPriceRows(
+      versionPrices.map((item, index) => ({
+        key: `price_db_${index}_${Date.now()}`,
+        version_name: item?.version_name || item?.name || '',
+        price_label: item?.price_label || item?.price || '',
+      }))
+    );
+
     setContent(result.data.content || "");
   };
 
@@ -238,6 +270,30 @@ export default function Admin() {
 
   const handleSetDefaultColor = (key) => {
     setColorOptions((prev) => prev.map((color) => ({ ...color, is_default: color.key === key })));
+  };
+
+  const handleAddPromotionRow = () => {
+    setPromotionRows((prev) => [...prev, createPromotionRow(prev.length)]);
+  };
+
+  const handleRemovePromotionRow = (key) => {
+    setPromotionRows((prev) => prev.filter((row) => row.key !== key));
+  };
+
+  const handlePromotionRowChange = (key, value) => {
+    setPromotionRows((prev) => prev.map((row) => (row.key === key ? { ...row, content: value } : row)));
+  };
+
+  const handleAddVersionPriceRow = () => {
+    setVersionPriceRows((prev) => [...prev, createVersionPriceRow(prev.length)]);
+  };
+
+  const handleRemoveVersionPriceRow = (key) => {
+    setVersionPriceRows((prev) => prev.filter((row) => row.key !== key));
+  };
+
+  const handleVersionPriceRowChange = (key, field, value) => {
+    setVersionPriceRows((prev) => prev.map((row) => (row.key === key ? { ...row, [field]: value } : row)));
   };
 
   const handleSubmit = async () => {
@@ -274,6 +330,20 @@ export default function Admin() {
     }
 
     const defaultColor = normalizedColors.find((c) => c.is_default) || normalizedColors[0];
+    const normalizedPromotions = promotionRows
+      .map((row, index) => ({
+        content: String(row?.content || '').trim(),
+        sort_order: index,
+      }))
+      .filter((row) => row.content);
+
+    const normalizedVersionPrices = versionPriceRows
+      .map((row, index) => ({
+        version_name: String(row?.version_name || '').trim(),
+        price_label: String(row?.price_label || '').trim(),
+        sort_order: index,
+      }))
+      .filter((row) => row.version_name || row.price_label);
 
     const formData = new FormData();
     formData.append("name", name);
@@ -283,6 +353,8 @@ export default function Admin() {
     formData.append("content", content);
     formData.append("image_url", defaultColor.image_url);
     formData.append("colors_json", JSON.stringify(normalizedColors));
+    formData.append("promotion_items_json", JSON.stringify(normalizedPromotions));
+    formData.append("version_price_rows_json", JSON.stringify(normalizedVersionPrices));
 
 
     let url = `${API_URL}/products`;
@@ -535,6 +607,82 @@ export default function Admin() {
             {imageUrl && (
               <p className="mt-3 text-xs text-gray-500">Ảnh đại diện hiện tại: {imageUrl}</p>
             )}
+          </div>
+
+          <div className="mb-6 rounded-lg border border-gray-200 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="block font-semibold">Bảng chương trình khuyến mãi</label>
+              <button
+                type="button"
+                onClick={handleAddPromotionRow}
+                className="rounded bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600"
+              >
+                + Thêm dòng
+              </button>
+            </div>
+            {!promotionRows.length && (
+              <p className="text-sm text-gray-600">Đang để trống. Nhấn "Thêm dòng" để tạo nội dung khuyến mãi.</p>
+            )}
+            <div className="space-y-3">
+              {promotionRows.map((row, index) => (
+                <div key={row.key} className="flex flex-col gap-2 rounded border border-gray-200 p-3 md:flex-row md:items-center">
+                  <input
+                    value={row.content}
+                    placeholder={`Nội dung khuyến mãi dòng ${index + 1}`}
+                    onChange={(e) => handlePromotionRowChange(row.key, e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 p-3"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePromotionRow(row.key)}
+                    className="rounded bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100"
+                  >
+                    Xóa
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-6 rounded-lg border border-gray-200 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <label className="block font-semibold">Bảng tên phiên bản và giá</label>
+              <button
+                type="button"
+                onClick={handleAddVersionPriceRow}
+                className="rounded bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600"
+              >
+                + Thêm dòng
+              </button>
+            </div>
+            {!versionPriceRows.length && (
+              <p className="text-sm text-gray-600">Đang để trống. Nhấn "Thêm dòng" để khai báo phiên bản và giá.</p>
+            )}
+            <div className="space-y-3">
+              {versionPriceRows.map((row, index) => (
+                <div key={row.key} className="grid grid-cols-1 gap-2 rounded border border-gray-200 p-3 md:grid-cols-12">
+                  <input
+                    value={row.version_name}
+                    placeholder={`Tên phiên bản ${index + 1}`}
+                    onChange={(e) => handleVersionPriceRowChange(row.key, 'version_name', e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 p-3 md:col-span-5"
+                  />
+                  <input
+                    value={row.price_label}
+                    placeholder="Giá (ví dụ: 499.000.000 VND)"
+                    onChange={(e) => handleVersionPriceRowChange(row.key, 'price_label', e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 p-3 md:col-span-6"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveVersionPriceRow(row.key)}
+                    className="rounded bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 md:col-span-1"
+                  >
+                    Xóa
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* TinyMCE editor */}

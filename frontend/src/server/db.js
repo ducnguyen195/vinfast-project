@@ -23,9 +23,13 @@ export async function ensureSchema() {
       price DOUBLE PRECISION NOT NULL DEFAULT 0,
       image_url VARCHAR(500),
       content TEXT,
+      promotion_items JSONB NOT NULL DEFAULT '[]'::jsonb,
+      version_price_rows JSONB NOT NULL DEFAULT '[]'::jsonb,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS promotion_items JSONB NOT NULL DEFAULT '[]'::jsonb;`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS version_price_rows JSONB NOT NULL DEFAULT '[]'::jsonb;`);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS customer_requests (

@@ -19,6 +19,26 @@ function DetailProduct({ initialProduct = null }) {
     return input.filter((item) => item?.image_url);
   };
 
+  const normalizePromotionItems = (input) => {
+    if (!Array.isArray(input)) return [];
+    return input
+      .map((item) => {
+        if (typeof item === 'string') return item.trim();
+        return String(item?.content || '').trim();
+      })
+      .filter(Boolean);
+  };
+
+  const normalizeVersionPriceRows = (input) => {
+    if (!Array.isArray(input)) return [];
+    return input
+      .map((item) => ({
+        version_name: String(item?.version_name || item?.name || '').trim(),
+        price_label: String(item?.price_label || item?.price || '').trim(),
+      }))
+      .filter((item) => item.version_name || item.price_label);
+  };
+
   const normalizeContentHtml = (html = '') => {
     if (!html || typeof html !== 'string') return '';
 
@@ -87,6 +107,8 @@ function DetailProduct({ initialProduct = null }) {
   const selectedImage = selectedColor?.image_url || product.image_url;
   const selectedImageUrl = selectedImage ? getImageUrl2(selectedImage) : '';
   const contentHtml = normalizeContentHtml(product?.content || '');
+  const promotionItems = normalizePromotionItems(product?.promotion_items || []);
+  const versionPriceRows = normalizeVersionPriceRows(product?.version_price_rows || []);
 
   const canonicalSlug = product?.slug || slug || '';
   const pageUrl = absoluteUrl(`/products/${canonicalSlug}`);
@@ -161,19 +183,40 @@ function DetailProduct({ initialProduct = null }) {
                   </div>
                 </div>
               )}
+
+              {versionPriceRows.length > 0 && (
+                <div className="mt-2 overflow-hidden rounded border border-gray-300">
+                  <div className="grid grid-cols-2 bg-[#0f4a72] text-center text-white">
+                    <div className="border-r border-gray-300 p-2 text-sm font-bold uppercase">Tên phiên bản</div>
+                    <div className="p-2 text-sm font-bold uppercase">Giá</div>
+                  </div>
+                  {versionPriceRows.map((row, index) => (
+                    <div key={`${row.version_name}_${row.price_label}_${index}`} className="grid grid-cols-2 border-t border-gray-300 bg-gray-100">
+                      <div className="border-r border-gray-300 p-2 text-sm font-semibold text-gray-700">{row.version_name || '-'}</div>
+                      <div className="p-2 text-sm font-semibold text-gray-700">{row.price_label || '-'}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="min-w-0">
               <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
               <p className="text-gray-700 mb-4">{product.description}</p>
-              <p className="text-xl font-semibold text-green-600 mb-4">
-                {new Intl.NumberFormat("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                }).format(product.price)}
-              </p>
-              <Link href="/contact" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                Liên Hệ Ngay
-              </Link>
+              {promotionItems.length > 0 && (
+                <div className="mb-5 rounded border border-red-200 bg-gray-100 p-4">
+                  <div className="mb-3 bg-[#0f4a72] p-3 text-center text-lg font-bold uppercase text-white">
+                    Chương trình khuyến mãi
+                  </div>
+                  <ul className="space-y-2">
+                    {promotionItems.map((line, index) => (
+                      <li key={`${index}_${line.slice(0, 20)}`} className="border-b border-dashed border-sky-300 pb-2 text-base text-gray-800">
+                        {line}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
             </div>
           </div>
           <div className="mt-8 text-gray-700 leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: contentHtml }}/>

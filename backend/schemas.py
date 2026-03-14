@@ -1,6 +1,6 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List, Dict, Any
 
 class ProductBase(BaseModel):
     name: str
@@ -9,6 +9,8 @@ class ProductBase(BaseModel):
     image_url: Optional[str] = None
     content: Optional[str] = None 
     slug: Optional[str] = None  # we include slug in responses (read-only)
+    promotion_items: List[Dict[str, Any]] = Field(default_factory=list)
+    version_price_rows: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class ProductCreate(ProductBase):

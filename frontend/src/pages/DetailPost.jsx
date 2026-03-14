@@ -18,7 +18,7 @@ export default function DetailPost({ initialPost = null }) {
   }, [slug, initialPost]);
 
   if (!post) return <div className="max-w-4xl mx-auto mt-8">Đang tải...</div>;
-
+vẫn 
   const normalizeContentHtml = (html = '') => {
     if (!html || typeof html !== 'string') return '';
 
