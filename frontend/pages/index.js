@@ -8,18 +8,27 @@ export async function getServerSideProps(context) {
 	const baseUrl = `${protocol}://${host}`;
 
 	try {
-		const res = await fetch(`${baseUrl}/api/products`);
-		const json = await res.json();
+		const [productsRes, postsRes] = await Promise.all([
+			fetch(`${baseUrl}/api/products`),
+			fetch(`${baseUrl}/api/posts`),
+		]);
+
+		const [productsJson, postsJson] = await Promise.all([
+			productsRes.json(),
+			postsRes.json(),
+		]);
 
 		return {
 			props: {
-				initialProducts: json?.data || [],
+				initialProducts: productsJson?.data || [],
+				initialPosts: (postsJson?.data || []).slice(0, 3),
 			},
 		};
 	} catch (error) {
 		return {
 			props: {
 				initialProducts: [],
+				initialPosts: [],
 			},
 		};
 	}

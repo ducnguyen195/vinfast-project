@@ -145,7 +145,7 @@ function DetailProduct({ initialProduct = null }) {
         type="product"
         jsonLd={productJsonLd}
       />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-9 bg-white p-4 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             <div className="w-full">
@@ -223,7 +223,7 @@ function DetailProduct({ initialProduct = null }) {
         </div>
 
         <div className="lg:col-span-3">
-          <div className="rounded-lg overflow-hidden shadow-xl sticky top-24">
+          <div className="rounded-lg overflow-hidden shadow-xl lg:sticky lg:top-24">
             <img src="/images/banner/9.jpg" alt="Vinfast Nguyễn Văn Linh" className="w-full h-48 object-cover"/>
             <div className="bg-gradient-to-b from-red-700 via-red-800 to-red-950 text-white p-4">
               <h2 className="text-xl font-bold mb-4 uppercase">

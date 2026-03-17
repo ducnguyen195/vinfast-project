@@ -5,11 +5,13 @@ import Seo from '../components/Seo';
 import { absoluteUrl } from '../utils/seo';
 import { getImageUrl } from '../api/config';
 
-function Home({ initialProducts = [] }) {
+function Home({ initialProducts = [], initialPosts = [] }) {
   const siteUrl = absoluteUrl('/');
   const featuredProducts = initialProducts;
+  const latestPosts = initialPosts;
 
   const formatPrice = (value) => Number(value || 0).toLocaleString('vi-VN');
+  const stripHtml = (value = '') => value.replace(/<[^>]*>/g, '').trim();
   const orgJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -71,7 +73,7 @@ function Home({ initialProducts = [] }) {
       <section className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-12">Tính Năng Nổi Bật</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="text-5xl mb-4">🔋</div>
               <h3 className="text-2xl font-bold mb-2">Pin Dung Lượng Cao</h3>
@@ -87,7 +89,50 @@ function Home({ initialProducts = [] }) {
               <h3 className="text-2xl font-bold mb-2">An Toàn Cao Cấp</h3>
               <p className="text-gray-600">Hệ thống an toàn 5 sao, tự lái cấp cao</p>
             </div>
+            <div className="text-center">
+              <div className="text-5xl mb-4">🌿</div>
+              <h3 className="text-2xl font-bold mb-2">Thân Thiện Môi Trường</h3>
+              <p className="text-gray-600">Xe điện không khí thải, tiết kiệm năng lượng</p>
+            </div>
           </div>
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="mb-10 flex items-center justify-center">
+            <h2 className="text-3xl md:text-4xl  font-bold">Tin Tức</h2>
+          </div>
+
+          {latestPosts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {latestPosts.map((post) => (
+                <article key={post.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition">
+                  {post.image_url ? (
+                    <img
+                      src={getImageUrl(post.image_url)}
+                      alt={post.title}
+                      className="h-52 w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-52 w-full bg-gray-200" />
+                  )}
+
+                  <div className="p-5">
+                    <Link href={`/posts/${post.slug || post.id}`}>
+                      <h3 className="text-xl font-bold text-vinfast hover:underline line-clamp-2">{post.title}</h3>
+                    </Link>
+                    <p className="mt-3 text-gray-600 line-clamp-3">
+                      {stripHtml(post.content || '').slice(0, 140)}
+                      {stripHtml(post.content || '').length > 140 ? '...' : ''}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">Chưa có bài viết để hiển thị.</div>
+          )}
         </div>
       </section>
     </div>
