@@ -9,6 +9,8 @@ export const config = {
   },
 };
 
+const isPositivePrice = (value) => Number.isFinite(value) && value > 0;
+
 export default async function handler(req, res) {
   try {
     await ensureSchema();
@@ -122,6 +124,10 @@ export default async function handler(req, res) {
 
       if (!name || !finalSlug) {
         return res.status(400).json({ success: false, detail: 'Thiếu tên hoặc slug' });
+      }
+
+      if (!isPositivePrice(price)) {
+        return res.status(400).json({ success: false, detail: 'Giá sản phẩm phải lớn hơn 0' });
       }
 
       const exists = await pool.query('SELECT id FROM products WHERE slug = $1 LIMIT 1', [finalSlug]);

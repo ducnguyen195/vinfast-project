@@ -52,7 +52,7 @@ function Navbar() {
             <Link href="/" className="block px-3 py-2 hover:bg-vinfast_light rounded">Trang Chủ</Link>
             <Link href="/products" className="block px-3 py-2 hover:bg-vinfast_light rounded">Sản Phẩm</Link>
             <Link href="/contact" className="block px-3 py-2 hover:bg-vinfast_light rounded">Liên Hệ</Link>
-            <Link href="/posts" className="block px-3 py-2 hover:bg-vinfast_light rounded">Bài Viết</Link>
+            <Link href="/posts" className="block px-3 py-2 hover:bg-vinfast_light rounded">Tin Tức</Link>
           </div>
         )}
       </div>

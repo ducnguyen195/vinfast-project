@@ -57,6 +57,24 @@ const uploadImageFile = async (file, metadata = {}) => {
   }
 };
 
+const parsePositivePrice = (value) => {
+  const normalizedValue = String(value ?? '').trim().replace(/,/g, '');
+  if (!normalizedValue) {
+    return { isValid: false, numericValue: null, message: 'Vui lòng nhập giá sản phẩm.' };
+  }
+
+  const numericValue = Number(normalizedValue);
+  if (!Number.isFinite(numericValue)) {
+    return { isValid: false, numericValue: null, message: 'Giá sản phẩm phải là số hợp lệ.' };
+  }
+
+  if (numericValue <= 0) {
+    return { isValid: false, numericValue, message: 'Giá sản phẩm phải lớn hơn 0.' };
+  }
+
+  return { isValid: true, numericValue, message: '' };
+};
+
 export default function Admin() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -67,6 +85,7 @@ export default function Admin() {
   const [prevAutoSlugProduct, setPrevAutoSlugProduct] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [priceError, setPriceError] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [colorOptions, setColorOptions] = useState([createColorDraft(0)]);
   const [promotionRows, setPromotionRows] = useState([]);
@@ -188,6 +207,7 @@ export default function Admin() {
       setSlug("");
       setDescription("");
       setPrice("");
+      setPriceError("");
       setImageUrl(""); 
       setColorOptions([createColorDraft(0)]);
       setPromotionRows([]);
@@ -203,6 +223,7 @@ export default function Admin() {
     setSlug(result.data.slug || "");
     setDescription(result.data.description || "");
     setPrice(result.data.price || "");
+    setPriceError("");
     setImageUrl(result.data.image_url || "");
     const colors = Array.isArray(result?.data?.colors) ? result.data.colors : [];
     if (colors.length) {
@@ -297,6 +318,14 @@ export default function Admin() {
   };
 
   const handleSubmit = async () => {
+    const priceValidation = parsePositivePrice(price);
+    if (!priceValidation.isValid) {
+      setPriceError(priceValidation.message);
+      alert(priceValidation.message);
+      return;
+    }
+
+    setPriceError("");
     const normalizedColors = [];
 
     for (let i = 0; i < colorOptions.length; i += 1) {
@@ -349,7 +378,7 @@ export default function Admin() {
     formData.append("name", name);
     formData.append("slug", slug);
     formData.append("description", description);
-    formData.append("price", price);
+    formData.append("price", String(priceValidation.numericValue));
     formData.append("content", content);
     formData.append("image_url", defaultColor.image_url);
     formData.append("colors_json", JSON.stringify(normalizedColors));
@@ -523,10 +552,21 @@ export default function Admin() {
             <label className="block font-semibold mb-2">Giá</label>
             <input
               value={price}
+              type="number"
+              min="0.01"
+              step="any"
               placeholder ="Nhập giá sản phẩm"
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => {
+                const nextPrice = e.target.value;
+                setPrice(nextPrice);
+                const validation = parsePositivePrice(nextPrice);
+                setPriceError(nextPrice ? validation.message : '');
+              }}
               className="w-full border border-gray-300 rounded-lg p-3"
             />
+            {priceError && (
+              <p className="mt-1 text-sm text-red-600">{priceError}</p>
+            )}
           </div>
 
           {/* Màu sắc + ảnh theo màu */}

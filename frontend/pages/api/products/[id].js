@@ -9,6 +9,8 @@ export const config = {
   },
 };
 
+const isPositivePrice = (value) => Number.isFinite(value) && value > 0;
+
 export default async function handler(req, res) {
   const { id } = req.query;
 
@@ -121,6 +123,14 @@ export default async function handler(req, res) {
       const current = await pool.query('SELECT * FROM products WHERE id = $1 LIMIT 1', [id]);
       if (current.rowCount === 0) {
         return res.status(404).json({ success: false, detail: 'Không tìm thấy sản phẩm' });
+      }
+
+      if (!name || !finalSlug) {
+        return res.status(400).json({ success: false, detail: 'Thiếu tên hoặc slug' });
+      }
+
+      if (!isPositivePrice(price)) {
+        return res.status(400).json({ success: false, detail: 'Giá sản phẩm phải lớn hơn 0' });
       }
 
       const exists = await pool.query('SELECT id FROM products WHERE slug = $1 AND id <> $2 LIMIT 1', [finalSlug, id]);
