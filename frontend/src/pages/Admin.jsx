@@ -75,6 +75,16 @@ const parsePositivePrice = (value) => {
   return { isValid: true, numericValue, message: '' };
 };
 
+const isRichTextEmpty = (value) => {
+  const raw = String(value || '');
+  const withoutTags = raw
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return !withoutTags;
+};
+
 export default function Admin() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -175,7 +185,15 @@ export default function Admin() {
 
         fetch(`${API_URL}/posts`)
           .then(res => res.json())
-          .then(data => setPosts(Array.isArray(data.data) ? data.data : []))
+          .then(data => {
+            const nextPosts = Array.isArray(data.data)
+              ? data.data.map((post) => ({
+                  ...post,
+                  title: String(post?.title || post?.name || post?.slug || '').trim(),
+                }))
+              : [];
+            setPosts(nextPosts);
+          })
           .catch(() => {
             setPosts([]);
             setLoadError("Khong tai duoc du lieu bai viet. Kiem tra DATABASE_URL/PostgreSQL.");
@@ -422,20 +440,62 @@ export default function Admin() {
       return;
     }
 
-    const res = await fetch(`${API_URL}/posts/slug/${posts.find(p=>p.id==id)?.slug}`);
-    const result = await res.json();
-    const p = result.data;
-    setPostTitle(p.title || "");
-    setPostSlug(p.slug || "");
-    setPrevAutoSlugPost(p.slug || "");
-    setPostImageUrl(p.image_url || "");
-    setPostImageFile(null);
-    setContent(p.content || "");
+    const selectedPost = posts.find((p) => String(p.id) === String(id));
+    if (selectedPost) {
+      setPostTitle(selectedPost.title || "");
+      setPostSlug(selectedPost.slug || "");
+      setPrevAutoSlugPost(selectedPost.slug || "");
+      setPostImageUrl(selectedPost.image_url || "");
+      setPostImageFile(null);
+      setContent(selectedPost.content || "");
+    }
+
+    try {
+      const slugToFetch = selectedPost?.slug;
+      if (!slugToFetch) {
+        if (!selectedPost) {
+          throw new Error('Khong tim thay bai viet da chon.');
+        }
+        return;
+      }
+
+      const res = await fetch(`${API_URL}/posts/slug/${encodeURIComponent(slugToFetch)}`);
+      const result = await res.json();
+      if (!res.ok || !result?.data) {
+        throw new Error(result?.detail || 'Khong tai duoc chi tiet bai viet.');
+      }
+
+      const p = result.data;
+      setPostTitle(p.title || selectedPost?.title || "");
+      setPostSlug(p.slug || selectedPost?.slug || "");
+      setPrevAutoSlugPost(p.slug || selectedPost?.slug || "");
+      setPostImageUrl(p.image_url || selectedPost?.image_url || "");
+      setPostImageFile(null);
+      setContent(p.content || selectedPost?.content || "");
+    } catch (error) {
+      alert(error?.message || 'Khong tai duoc bai viet da chon');
+    }
   };
 
   const handleSubmitPost = async () => {
+    const normalizedTitle = String(postTitle || '').trim();
+    if (!normalizedTitle) {
+      alert('Vui long nhap tieu de bai viet.');
+      return;
+    }
+
+    if (isRichTextEmpty(content)) {
+      alert('Vui long nhap noi dung bai viet.');
+      return;
+    }
+
+    if (!postImageFile && !String(postImageUrl || '').trim()) {
+      alert('Vui long chon anh dai dien cho bai viet.');
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("title", postTitle);
+    formData.append("title", normalizedTitle);
     formData.append("slug", postSlug);
     formData.append("content", content);
     if (postImageFile) {
@@ -778,7 +838,7 @@ export default function Admin() {
               <option value="">-- Tạo bài viết mới --</option>
               {posts.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.id} - {p.title}
+                  {p.id} - {(p.title || p.slug || 'Khong co tieu de')}
                 </option>
               ))}
             </select>
@@ -798,7 +858,17 @@ export default function Admin() {
 
           <div className="mb-4">
             <label className="block font-semibold mb-2">Ảnh đại diện</label>
-            {postImageUrl && !postImageFile && (<img src={getImageUrl(postImageUrl)} className="w-40 mt-2 rounded" />)}
+            {postImageUrl && !postImageFile && (
+              <img
+                src={getImageUrl(postImageUrl) || postImageUrl}
+                onError={(e) => {
+                  if (e.currentTarget.src !== postImageUrl) {
+                    e.currentTarget.src = postImageUrl;
+                  }
+                }}
+                className="w-40 mt-2 rounded"
+              />
+            )}
             <input type="file" onChange={(e) => setPostImageFile(e.target.files[0])} className="w-full border border-gray-300 rounded-lg p-3 mt-2" />
           </div>
 
