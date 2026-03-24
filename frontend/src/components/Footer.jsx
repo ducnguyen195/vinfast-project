@@ -21,7 +21,6 @@ function Footer() {
             <ul className="text-gray-300 space-y-2">
               <li><a href="#" className="hover:text-vinfast_light">VinFast VF 8</a></li>
               <li><a href="#" className="hover:text-vinfast_light">VinFast VF 9</a></li>
-              <li><a href="#" className="hover:text-vinfast_light">VinFast VF e34</a></li>
               <li><a href="#" className="hover:text-vinfast_light">VinFast VF Limo Green</a></li>
             </ul>
           </div>

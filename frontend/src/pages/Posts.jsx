@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Link from 'next/link';
+import { decode } from 'he';
 import API_URL, { getImageUrl } from "../api/config";
 import Seo from '../components/Seo';
 import { absoluteUrl } from '../utils/seo';
@@ -17,6 +18,10 @@ export default function Posts({ initialPosts = [] }) {
   }, [initialPosts]);
 
   const getImageUrl2 = getImageUrl;  // Reuse from config
+  const toPlainText = (value = '') => decode(String(value || ''))
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   return (
     <div className="max-w-5xl mx-auto mt-8">
@@ -36,9 +41,12 @@ export default function Posts({ initialPosts = [] }) {
               )}
               <div>
                 <Link href={`/posts/${p.slug}`} className="text-lg font-semibold hover:text-vinfast_light">
-                  {p.title}
+                  {toPlainText(p.title || '')}
                 </Link>
-                <p className="text-sm text-gray-600 mt-2" dangerouslySetInnerHTML={{ __html: p.content?.slice(0, 200) + '...' }} />
+                <p className="text-sm text-gray-600 mt-2">
+                  {toPlainText(p.content || '').slice(0, 200)}
+                  {toPlainText(p.content || '').length > 200 ? '...' : ''}
+                </p>
               </div>
             </div>
           </div>

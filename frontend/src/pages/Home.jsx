@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Slider from "../components/Slider";
+import { decode } from 'he';
 import Seo from '../components/Seo';
 import { absoluteUrl } from '../utils/seo';
 import { getImageUrl } from '../api/config';
@@ -11,7 +12,10 @@ function Home({ initialProducts = [], initialPosts = [] }) {
   const latestPosts = initialPosts;
 
   const formatPrice = (value) => Number(value || 0).toLocaleString('vi-VN');
-  const stripHtml = (value = '') => value.replace(/<[^>]*>/g, '').trim();
+  const toPlainText = (value = '') => decode(String(value || ''))
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   const orgJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -120,11 +124,11 @@ function Home({ initialProducts = [], initialPosts = [] }) {
 
                   <div className="p-5">
                     <Link href={`/posts/${post.slug || post.id}`}>
-                      <h3 className="text-xl font-bold text-vinfast hover:underline line-clamp-2">{post.title}</h3>
+                      <h3 className="text-xl font-bold text-vinfast hover:underline line-clamp-2">{toPlainText(post.title || '')}</h3>
                     </Link>
                     <p className="mt-3 text-gray-600 line-clamp-3">
-                      {stripHtml(post.content || '').slice(0, 140)}
-                      {stripHtml(post.content || '').length > 140 ? '...' : ''}
+                      {toPlainText(post.content || '').slice(0, 140)}
+                      {toPlainText(post.content || '').length > 140 ? '...' : ''}
                     </p>
                   </div>
                 </article>

@@ -8,7 +8,7 @@ const cars = [
     versions: [
       {
         name: "Vinfast VF3 - Kèm Pin",
-        price: "299.000.000 VND"
+        price: "302.000.000 VND"
       }
     ]
   },
@@ -27,12 +27,12 @@ const cars = [
     image: "/images/products/vinfast-vf6.png",
     versions: [
       {
-        name: "VinFast VF6 Eco - Nâng Cấp",
-        price: "694.000.000 VND"
+        name: "VinFast VF6 Eco - Kèm Pin",
+        price: "689.000.000 VND"
       },
       {
-        name: "VinFast VF6 Plus - Nâng Cấp",
-        price: "759.000.000 VND"
+        name: "VinFast VF6 Plus - Kèm Pin",
+        price: "745.000.000 VND"
       }
     ]
   },
@@ -42,16 +42,12 @@ const cars = [
     versions: [
         {
         name: "VinFast VF7 Eco - Kèm Pin",
-        price: "799.000.000 VND"
+        price: "789.000.000 VND"
       },
       {
-        name: "VinFast VF7 Eco - Nâng Cấp",
-        price: "999.000.000 VND"
+        name: "VinFast VF7 Plus - Kèm Pin",
+        price: "899.000.000 VND"
       },
-      {
-        name: "VinFast VF7 Plus - Nâng Cấp",
-        price: "1.019.000.000 VND"
-      }
     ]
   },
   {
@@ -59,8 +55,8 @@ const cars = [
     image: "/images/products/vinfast-vf8.png",
     versions: [
       {
-        name: "VinFast VF8 Eco - Nâng Cấp",
-        price: "1.069.000.000 VND"
+        name: "VinFast VF8 Eco - Kèm Pin",
+        price: "1.019.000.000 VND"
       },
       {
         name: "VinFast VF8 Plus - Kèm Pin",
