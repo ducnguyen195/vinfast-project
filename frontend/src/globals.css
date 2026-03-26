@@ -19,9 +19,20 @@
   overflow-wrap: break-word;
   padding: 8px;
   border: 1px solid #ddd;
+  height: auto !important;
+  min-height: 0 !important;
+  vertical-align: top;
+  overflow: visible !important;
+}
+
+/* Override TinyMCE inline style height on td */
+.rich-content table td[style*="height"],
+.rich-content table th[style*="height"] {
+  height: auto !important;
 }
 
 .rich-content img {
   max-width: 100%;
-  height: auto;
+  height: auto !important;
+  display: block;
 }
