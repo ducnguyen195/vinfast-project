@@ -219,7 +219,7 @@ function DetailProduct({ initialProduct = null }) {
               
             </div>
           </div>
-          <div className="mt-8 text-gray-700 leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: contentHtml }}/>
+          <div className="rich-content mt-8 text-gray-700 leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: contentHtml }}/>
         </div>
 
         <div className="lg:col-span-3">

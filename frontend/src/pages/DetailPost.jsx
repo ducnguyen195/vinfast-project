@@ -90,7 +90,7 @@ export default function DetailPost({ initialPost = null }) {
       />
       <h1 className="text-2xl font-bold mb-4">{post.title}</h1>
       {post.image_url && <img src={getImageUrl2(post.image_url)} alt={post.title} className="w-full h-auto object-cover rounded mb-4" />}
-      <div className="prose" dangerouslySetInnerHTML={{ __html: contentHtml }} />
+      <div className="prose max-w-none rich-content" dangerouslySetInnerHTML={{ __html: contentHtml }} />
     </div>
   );
 }

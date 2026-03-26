@@ -11,3 +11,44 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+.rich-content {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.rich-content * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.rich-content img,
+.rich-content video,
+.rich-content iframe,
+.rich-content canvas,
+.rich-content svg {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+.rich-content table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  width: 100% !important;
+}
+
+.rich-content [style*='display:flex'],
+.rich-content [style*='display: flex'] {
+  flex-wrap: wrap !important;
+}
+
+.rich-content [style*='white-space: nowrap'],
+.rich-content [style*='white-space:nowrap'] {
+  white-space: normal !important;
+}
+
+.rich-content [style*='width:'] {
+  max-width: 100% !important;
+}

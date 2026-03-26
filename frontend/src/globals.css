@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Rich content styling for TinyMCE output */
+.rich-content {
+  overflow-x: auto;
+}
+
+.rich-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+.rich-content table td,
+.rich-content table th {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.rich-content img {
+  max-width: 100%;
+  height: auto;
+}
