@@ -11,3 +11,36 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+.rich-content {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.rich-content img,
+.rich-content video,
+.rich-content iframe,
+.rich-content canvas,
+.rich-content svg {
+  height: auto;
+  max-width: 100%;
+}
+
+.rich-content table {
+  border-collapse: collapse;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.rich-content table td,
+.rich-content table th {
+  overflow-wrap: anywhere;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.rich-content [style*='width:'] {
+  max-width: 100% !important;
+}
