@@ -1,38 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Rich content styling for TinyMCE output */
-.rich-content {
-  overflow-x: auto;
-}
-
-.rich-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 10px 0;
-}
-
-.rich-content table td,
-.rich-content table th {
-  word-break: break-word;
-  overflow-wrap: break-word;
-  padding: 8px;
-  border: 1px solid #ddd;
-  height: auto !important;
-  min-height: 0 !important;
-  vertical-align: top;
-  overflow: visible !important;
-}
-
-/* Override TinyMCE inline style height on td */
-.rich-content table td[style*="height"],
-.rich-content table th[style*="height"] {
-  height: auto !important;
-}
-
-.rich-content img {
-  max-width: 100%;
-  height: auto !important;
-  display: block;
-}
