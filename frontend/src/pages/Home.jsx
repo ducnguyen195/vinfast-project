@@ -6,9 +6,32 @@ import Seo from '../components/Seo';
 import { absoluteUrl } from '../utils/seo';
 import { getImageUrl } from '../api/config';
 
+const extractVfNumber = (name = '') => {
+  const match = String(name).match(/\bvf\s*(\d+)\b/i);
+  return match ? Number(match[1]) : null;
+};
+
+const sortOnlyVfProducts = (items = []) => {
+  const list = Array.isArray(items) ? items : [];
+  const vfItems = [];
+  const nonVfItems = [];
+
+  list.forEach((item) => {
+    const vfNumber = extractVfNumber(item?.name || '');
+    if (vfNumber !== null) {
+      vfItems.push({ item, vfNumber });
+      return;
+    }
+    nonVfItems.push(item);
+  });
+
+  vfItems.sort((a, b) => a.vfNumber - b.vfNumber);
+  return [...vfItems.map(({ item }) => item), ...nonVfItems];
+};
+
 function Home({ initialProducts = [], initialPosts = [] }) {
   const siteUrl = absoluteUrl('/');
-  const featuredProducts = initialProducts;
+  const featuredProducts = sortOnlyVfProducts(initialProducts);
   const latestPosts = initialPosts;
 
   const formatPrice = (value) => Number(value || 0).toLocaleString('vi-VN');

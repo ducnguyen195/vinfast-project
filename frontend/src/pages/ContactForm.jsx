@@ -5,6 +5,29 @@ import API_URL from '../api/config';
 import Seo from '../components/Seo';
 import { absoluteUrl } from '../utils/seo';
 
+const extractVfNumber = (name = '') => {
+  const match = String(name).match(/\bvf\s*(\d+)\b/i);
+  return match ? Number(match[1]) : null;
+};
+
+const sortOnlyVfProducts = (items = []) => {
+  const list = Array.isArray(items) ? items : [];
+  const vfItems = [];
+  const nonVfItems = [];
+
+  list.forEach((item) => {
+    const vfNumber = extractVfNumber(item?.name || '');
+    if (vfNumber !== null) {
+      vfItems.push({ item, vfNumber });
+      return;
+    }
+    nonVfItems.push(item);
+  });
+
+  vfItems.sort((a, b) => a.vfNumber - b.vfNumber);
+  return [...vfItems.map(({ item }) => item), ...nonVfItems];
+};
+
 function ContactForm() {
   const router = useRouter();
   const queryProduct = typeof router.query.product === 'string' ? router.query.product : '';
@@ -30,7 +53,7 @@ function ContactForm() {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(`${API_URL}/products`);
-        const fetchedProducts = response.data?.data || [];
+        const fetchedProducts = sortOnlyVfProducts(response.data?.data || []);
         setProducts(fetchedProducts);
 
         // If there is no product from query, default to the first product from API.

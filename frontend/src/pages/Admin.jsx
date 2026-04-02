@@ -85,6 +85,29 @@ const isRichTextEmpty = (value) => {
   return !withoutTags;
 };
 
+const extractVfNumber = (name = '') => {
+  const match = String(name).match(/\bvf\s*(\d+)\b/i);
+  return match ? Number(match[1]) : null;
+};
+
+const sortOnlyVfProducts = (items = []) => {
+  const list = Array.isArray(items) ? items : [];
+  const vfItems = [];
+  const nonVfItems = [];
+
+  list.forEach((item) => {
+    const vfNumber = extractVfNumber(item?.name || '');
+    if (vfNumber !== null) {
+      vfItems.push({ item, vfNumber });
+      return;
+    }
+    nonVfItems.push(item);
+  });
+
+  vfItems.sort((a, b) => a.vfNumber - b.vfNumber);
+  return [...vfItems.map(({ item }) => item), ...nonVfItems];
+};
+
 export default function Admin() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -177,7 +200,7 @@ export default function Admin() {
 
         fetch(`${API_URL}/products`)
           .then(res => res.json())
-          .then(data => setProducts(Array.isArray(data.data) ? data.data : []))
+          .then(data => setProducts(sortOnlyVfProducts(Array.isArray(data.data) ? data.data : [])))
           .catch(() => {
             setProducts([]);
             setLoadError("Khong tai duoc du lieu san pham. Kiem tra DATABASE_URL/PostgreSQL.");
