@@ -39,8 +39,8 @@ function Footer() {
             <h4 className="text-xl font-bold mb-4">Công Cụ</h4>
              <ul className="text-gray-300 space-y-2">
               <li><a href="#" className="hover:text-vinfast_light">Thủ tục trả góp</a></li>
-              <li><a href="#" className="hover:text-vinfast_light">Đăng ký lái thử</a></li>
-              <li><a href="#" className="hover:text-vinfast_light">Bảng giá xe Vinfast</a></li>
+              <li><a href="/contact" className="hover:text-vinfast_light">Đăng ký lái thử</a></li>
+              <li><a href="/price-table" className="hover:text-vinfast_light">Bảng giá xe Vinfast</a></li>
               <li><a href="#" className="hover:text-vinfast_light">Chính sách bảo mật</a></li>
             </ul>
           </div>
